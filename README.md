@@ -1,1 +1,3 @@
-# ckeditor4-workflows-common
+# CKEditor 4 Workflows Common
+
+Shared CKEditor 4 GitHub workflows.
