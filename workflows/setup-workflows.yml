@@ -34,9 +34,11 @@ jobs:
               if [[ -e "$existingFile" && $(diff "$newFile" "$existingFile" | wc -c) -ne 0 ]]; then
                 echo "Updating $newFile workflow..."
                 cp $file $existingFile
+                echo "HAS_CHANGES=1" >> $GITHUB_ENV
               else
                 echo "Creating $newFile workflow..."
                 cp $file $existingFile
+                echo "HAS_CHANGES=1" >> $GITHUB_ENV
               fi
             fi
           done
