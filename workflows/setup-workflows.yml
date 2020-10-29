@@ -31,7 +31,7 @@ jobs:
             if [[ -e "$file" ]]; then
               newFile=$(basename $file)
               existingFile="./.github/workflows/$newFile"
-              if [[ -e "$existingFile" && $(diff "$newFile" "$existingFile" | wc -c) -ne 0 ]]; then
+              if [[ -e "$existingFile" && $(diff "$file" "$existingFile" | wc -c) -ne 0 ]]; then
                 echo "Updating $newFile workflow..."
                 cp $file $existingFile
                 echo "HAS_CHANGES=1" >> $GITHUB_ENV
