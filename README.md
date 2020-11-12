@@ -12,4 +12,4 @@ The `setup-workflows.yml` workflow checkouts this repository once a day in the r
 
 1. Copy `workflows/setup-workflows.yml` workflow to your repository.
 1. Setup `secrets.BOT_USERNAME` and `secrets.BOT_EMAIL` to GitHub user which has a push access to your repository.
-1. Setup `secrets.TOKEN_WORKFLOWS` to GitHub token which has `workflows` permission.
+1. Setup `secrets.GH_WORKFLOWS_TOKEN` to GitHub token which has `workflows` permission.
