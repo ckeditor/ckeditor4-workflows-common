@@ -29,21 +29,10 @@ jobs:
 
       - name: Copy workflow files
         run: |
-          for file in ./ckeditor4-workflows-common/workflows/*.yml; do
-            if [[ -e "$file" ]]; then
-              newFile=$(basename $file)
-              existingFile="./.github/workflows/$newFile"
-              if [[ -e "$existingFile" && $(diff "$file" "$existingFile" | wc -c) -ne 0 ]]; then
-                echo "Updating $newFile workflow..."
-                cp $file $existingFile
-                echo "HAS_CHANGES=1" >> $GITHUB_ENV
-              else
-                echo "Creating $newFile workflow..."
-                cp $file $existingFile
-                echo "HAS_CHANGES=1" >> $GITHUB_ENV
-              fi
-            fi
-          done
+          rsync -a --include='*/' --include='*.yml' --exclude='*' ./ckeditor4-workflows-common/workflows/ ./.github/workflows/
+          if [[ $(git status --porcelain) ]]; then
+              echo "HAS_CHANGES=1"
+          fi
 
       - name: Cleanup common workflows artifacts
         run: |
