@@ -13,7 +13,7 @@ jobs:
         # https://github.com/marketplace/actions/checkout
         uses: actions/checkout@v2
         with:
-          token: ${{ secrets.TOKEN_WORKFLOWS }}
+          token: ${{ secrets.GH_WORKFLOWS_TOKEN }}
 
       - name: Checkout common workflows repository
         # https://github.com/marketplace/actions/checkout
@@ -51,5 +51,5 @@ jobs:
         # https://github.com/marketplace/actions/github-push
         uses: ad-m/github-push-action@master
         with:
-          github_token: ${{ secrets.TOKEN_WORKFLOWS }}
+          github_token: ${{ secrets.GH_WORKFLOWS_TOKEN }}
           branch: ${{ github.ref }}
