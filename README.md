@@ -6,7 +6,7 @@ Shared CKEditor 4 GitHub workflows.
 
 The main function of `setup-workflows.yml` workflow is to propagate common workflows and keep them up to date.
 
-The `setup-workflows.yml` workflow works in a way that it checkouts this repository once a day in a repository it is executed and updates (or creates) all common workflows. Common workflows are stored in `./workflows/` directory. There is also `setup-workflows.yml` workflow, which means, once it is set it will auto update itself too.
+The `setup-workflows.yml` workflow checkouts this repository once a day in the repository it is executed and updates (or creates) all common workflows. Common workflows are stored in `./workflows/` directory. There is also `setup-workflows.yml` workflow there, which means, once it is set it will auto-update itself too.
 
 ## Setup
 
