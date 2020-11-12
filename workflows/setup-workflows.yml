@@ -41,8 +41,8 @@ jobs:
       - name: Add changes
         if: env.HAS_CHANGES == 1
         run: |
-          git config --local user.email "${{ secrets.BOT_EMAIL }}"
-          git config --local user.name "${{ secrets.BOT_USERNAME }}"
+          git config --local user.email "${{ secrets.GH_BOT_EMAIL }}"
+          git config --local user.name "${{ secrets.GH_BOT_USERNAME }}"
           git add .github/workflows
           git commit -m "Update common workflows."
 
