@@ -13,7 +13,7 @@ jobs:
         run: |
           echo "SETTINGS={}" >> $GITHUB_ENV
           if [[ -f "./.github/workflows-config.json" ]]; then
-            echo "SETTINGS=$( jq './.github/workflows-config.json' )" >> $GITHUB_ENV
+            echo "SETTINGS=$( jq .setupWorkflows './.github/workflows-config.json' )" >> $GITHUB_ENV
           fi
 
       - name: Checkout default branch
@@ -49,7 +49,7 @@ jobs:
         if: env.HAS_CHANGES == 1
         run: |
           echo "BRANCH_NAME=${{ github.ref }}" >> $GITHUB_ENV
-          pushAsPullRequest=$(echo ${{ env.SETTINGS }} | jq ".setupWorkflows.pushAsPullRequest")
+          pushAsPullRequest=$(echo ${{ env.SETTINGS }} | jq ".pushAsPullRequest")
           if [[ "$pushAsPullRequest" == true ]]; then
             echo "AS_PR=1" >> $GITHUB_ENV
             echo "BRANCH_NAME=t/setup-workflows-update" >> $GITHUB_ENV

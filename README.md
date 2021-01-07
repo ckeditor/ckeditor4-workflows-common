@@ -22,12 +22,12 @@ Some workflows may be altered by configuration options (refer to [Available work
 
 For any workflow which needs to load and use configuration values, it is recommended to load config as first step of entire workflow using [jq](https://stedolan.github.io/jq/) like:
 
-```json
+```yml
 - name: Read config
   run: |
     echo "SETTINGS={}" >> $GITHUB_ENV
     if [[ -f "./.github/workflows-config.json" ]]; then
-      echo "SETTINGS=$( jq './.github/workflows-config.json' )" >> $GITHUB_ENV
+      echo "SETTINGS=$( jq .workflowName './.github/workflows-config.json' )" >> $GITHUB_ENV
     fi
 ```
 
