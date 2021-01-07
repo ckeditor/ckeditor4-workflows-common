@@ -41,7 +41,7 @@ $(echo ${{ env.SETTINGS }} | jq ".propertyName")
 
 ### setup-workflows
 
-This is the main workflow responsible for propagating all common workflows. When it is added to any other repository it checkouts this repository and copies all common workflows from `workflows/` directory to `.github/workflows/` one. It is done once a day so any changes are propagated on a daily basis. See `workflows/setup-workflows.yml` file.
+This is the main workflow responsible for propagating all common workflows. When it is added to any other repository it checkouts this repository and copies all common workflows from `workflows/` directory to `.github/workflows/` one. It is run once a day (at 02:00 UTC) so any changes are propagated on a daily basis. See `workflows/setup-workflows.yml` file.
 
 It is a cron job task so will be triggered only on main repository branch.
 
@@ -74,7 +74,7 @@ Since this workflow uses labels to mark stale issues/PRs, labels should be alrea
 
 ### update-deps
 
-Workflow responsible for updating NPM dependencies. It is run once a week and creates two PRs (if there are any outdated dependencies) - one for dev dependencies and one for production ones. It checks `package.json` file in the repository root and uses `npm-check` to update all dev/prod dependencies (which means `package.json` versioning is not respected). It is a cron job task so will be triggered only on main repository branch. See `workflows/update-deps.yml` file.
+Workflow responsible for updating NPM dependencies. It is run once a week (at 05:00 UTC on Monday) and creates two PRs (if there are any outdated dependencies) - one for dev dependencies and one for production ones. It checks `package.json` file in the repository root and uses `npm-check` to update all dev/prod dependencies (which means `package.json` versioning is not respected). It is a cron job task so will be triggered only on main repository branch. See `workflows/update-deps.yml` file.
 
 #### Required secrets
 
