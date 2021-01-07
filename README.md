@@ -18,6 +18,25 @@ The `setup-workflows.yml` workflow checkouts this repository once a day in the t
 
 Some workflows may be altered by configuration options (refer to [Available workflows](#available-workflows) section below). The configuration file is optional and not present by default. If needed, it should be added to any repository using common workflows as `.github/workflows-config.json` file.
 
+### Loading configuration file
+
+For any workflow which needs to load and use configuration values, it is recommended to load config as first step of entire workflow using [jq](https://stedolan.github.io/jq/) like:
+
+```json
+- name: Read config
+  run: |
+    echo "SETTINGS={}" >> $GITHUB_ENV
+    if [[ -f "./.github/workflows-config.json" ]]; then
+      echo "SETTINGS=$( jq './.github/workflows-config.json' )" >> $GITHUB_ENV
+    fi
+```
+
+Then, further in the workflow any step can use $SETTINGS variable and read any configuration properties like:
+
+```bash
+$(echo ${{ env.SETTINGS }} | jq ".propertyName")
+```
+
 ## Available workflows
 
 ### setup-workflows

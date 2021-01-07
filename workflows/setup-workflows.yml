@@ -9,6 +9,13 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Read config
+        run: |
+          echo "SETTINGS={}" >> $GITHUB_ENV
+          if [[ -f "./.github/workflows-config.json" ]]; then
+            echo "SETTINGS=$( jq './.github/workflows-config.json' )" >> $GITHUB_ENV
+          fi
+
       - name: Checkout default branch
         # https://github.com/marketplace/actions/checkout
         uses: actions/checkout@v2
@@ -42,13 +49,11 @@ jobs:
         if: env.HAS_CHANGES == 1
         run: |
           echo "BRANCH_NAME=${{ github.ref }}" >> $GITHUB_ENV
-          if [[ -f "./.github/workflows-config.json" ]]; then
-            pushAsPullRequest=$(jq ".setupWorkflows.pushAsPullRequest" "./.github/workflows-config.json")
-            if [[ "$pushAsPullRequest" == true ]]; then
-              echo "AS_PR=1" >> $GITHUB_ENV
-              echo "BRANCH_NAME=t/setup-workflows-update" >> $GITHUB_ENV
-              git checkout -b t/setup-workflows-update
-            fi
+          pushAsPullRequest=$(echo ${{ env.SETTINGS }} | jq ".setupWorkflows.pushAsPullRequest")
+          if [[ "$pushAsPullRequest" == true ]]; then
+            echo "AS_PR=1" >> $GITHUB_ENV
+            echo "BRANCH_NAME=t/setup-workflows-update" >> $GITHUB_ENV
+            git checkout -b t/setup-workflows-update
           fi
 
       - name: Add changes
