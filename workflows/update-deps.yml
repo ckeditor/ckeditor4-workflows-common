@@ -13,6 +13,13 @@ jobs:
         deps: [production, dev-only]
 
     steps:
+      - name: Read config
+        run: |
+          echo "SETTINGS={}" >> $GITHUB_ENV
+          if [[ -f "./.github/workflows-config.json" ]]; then
+            echo "SETTINGS=$( jq .updateDeps './.github/workflows-config.json' )" >> $GITHUB_ENV
+          fi
+
       - name: Setup node
         # https://github.com/marketplace/actions/setup-node-js-environment
         uses: actions/setup-node@v1
@@ -24,10 +31,6 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Check env variables
-        # Expected secrets variables:
-        # GH_BOT_USERNAME - GH user name which will be used to push changes.
-        # GH_BOT_EMAIL - GH user email which will be used to push changes.
-        # [BRANCH_MAIN] - Target branch name (optional), if not set default branch will be used.
         run: |
           if [[ -z "${{ secrets.GH_BOT_USERNAME }}" ]]; then
             echo "Expected 'GH_BOT_USERNAME' secret variable to be set."
@@ -37,11 +40,12 @@ jobs:
             echo "Expected 'GH_BOT_EMAIL' secret variable to be set."
             exit 1
           fi
-          if [[ -z "${{ secrets.BRANCH_MAIN }}" ]]; then
+          BRANCH_MAIN=$(echo ${{ env.SETTINGS }} | jq ".branchMain")
+          if [[ -z "$BRANCH_MAIN" ]]; then
             # Since 'Fetch changes' step fetches default branch, we just get branch name (which will be default one).
             echo "BRANCH_MAIN=$(git rev-parse --abbrev-ref HEAD)" >> $GITHUB_ENV
           else
-            echo "BRANCH_MAIN=${{ secrets.BRANCH_MAIN }}" >> $GITHUB_ENV
+            echo "$BRANCH_MAIN" >> $GITHUB_ENV
           fi
 
       - name: Check if update branch already exists

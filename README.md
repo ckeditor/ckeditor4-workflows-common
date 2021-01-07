@@ -81,6 +81,6 @@ Workflow responsible for updating NPM dependencies. It is run once a week (at 05
 * `GH_BOT_EMAIL` - GitHub user email which acts as an author of all commits done by this job.
 * `GH_BOT_USERNAME` - GitHub user username which acts as an author of all commits done by this job.
 
-#### Optional secrets
+#### Optional configuration
 
-* `BRANCH_MAIN` - Target branch name. By default, workflow runs on main repository branch.
+* `updateDeps.branchMain` : `String` Target branch name. By default, workflow runs on main repository branch.
