@@ -2,7 +2,13 @@ name: Setup and update common workflows
 
 on:
   schedule:
-  - cron: "0 2 * * *"
+    - cron: "0 2 * * *"
+  workflow_dispatch:
+    inputs:
+      config:
+        description: 'Config'
+        required: false
+        default: ''
 
 jobs:
   update:
@@ -11,10 +17,14 @@ jobs:
     steps:
       - name: Read config
         run: |
-          echo "SETTINGS={}" >> $GITHUB_ENV
-          if [[ -f "./.github/workflows-config.json" ]]; then
-            echo "SETTINGS=$( jq .setupWorkflows './.github/workflows-config.json' )" >> $GITHUB_ENV
+          CONFIG='{}'
+          if [[ ! -z '${{ github.event.inputs.config }}' ]]; then
+            CONFIG='${{ github.event.inputs.config }}'
+          elif [[ -f "./.github/workflows-config.json" ]]; then
+            CONFIG=$( jq .setupWorkflows './.github/workflows-config.json' )
           fi
+          echo "CONFIG=$CONFIG" >> $GITHUB_ENV
+          echo "Workflow config: $CONFIG"
 
       - name: Checkout default branch
         # https://github.com/marketplace/actions/checkout
