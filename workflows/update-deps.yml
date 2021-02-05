@@ -2,7 +2,13 @@ name: Update NPM dependencies
 
 on:
   schedule:
-  - cron: "0 5 * * 1"
+    - cron: "0 5 * * 1"
+  workflow_dispatch:
+    inputs:
+      config:
+        description: 'Config'
+        required: false
+        default: ''
 
 jobs:
   update:
@@ -15,10 +21,14 @@ jobs:
     steps:
       - name: Read config
         run: |
-          echo "SETTINGS={}" >> $GITHUB_ENV
-          if [[ -f "./.github/workflows-config.json" ]]; then
-            echo "SETTINGS=$( jq .updateDeps './.github/workflows-config.json' )" >> $GITHUB_ENV
+          CONFIG='{}'
+          if [[ ! -z '${{ github.event.inputs.config }}' ]]; then
+            CONFIG='${{ github.event.inputs.config }}'
+          elif [[ -f "./.github/workflows-config.json" ]]; then
+            CONFIG=$( jq .updateDeps './.github/workflows-config.json' )
           fi
+          echo "CONFIG=$CONFIG" >> $GITHUB_ENV
+          echo "Workflow config: $CONFIG"
 
       - name: Setup node
         # https://github.com/marketplace/actions/setup-node-js-environment
@@ -40,13 +50,12 @@ jobs:
             echo "Expected 'GH_BOT_EMAIL' secret variable to be set."
             exit 1
           fi
-          BRANCH_MAIN=$(echo ${{ env.SETTINGS }} | jq ".branchMain")
-          if [[ -z "$BRANCH_MAIN" ]]; then
+          BRANCH_MAIN=$(echo '${{ env.CONFIG }}' | jq -r ".branchMain")
+          if [[ -z "$BRANCH_MAIN" || "$BRANCH_MAIN" == "null" ]]; then
             # Since 'Fetch changes' step fetches default branch, we just get branch name (which will be default one).
-            echo "BRANCH_MAIN=$(git rev-parse --abbrev-ref HEAD)" >> $GITHUB_ENV
-          else
-            echo "$BRANCH_MAIN" >> $GITHUB_ENV
+            BRANCH_MAIN=$(git rev-parse --abbrev-ref HEAD)
           fi
+          echo "BRANCH_MAIN=$BRANCH_MAIN" >> $GITHUB_ENV
 
       - name: Check if update branch already exists
         run: |
