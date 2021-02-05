@@ -20,21 +20,48 @@ Some workflows may be altered by configuration options (refer to [Available work
 
 ### Loading configuration file
 
-For any workflow which needs to load and use configuration values, it is recommended to load config as first step of entire workflow using [jq](https://stedolan.github.io/jq/) like:
+For any workflow which needs to load and use configuration values, it is recommended to load config as soon as possible (so right after checkout) using [jq](https://stedolan.github.io/jq/) like:
 
 ```yml
 - name: Read config
   run: |
-    echo "SETTINGS={}" >> $GITHUB_ENV
+    CONFIG='{}'
     if [[ -f "./.github/workflows-config.json" ]]; then
-      echo "SETTINGS=$( jq .workflowName './.github/workflows-config.json' )" >> $GITHUB_ENV
+      CONFIG=$( jq -c .setupWorkflows './.github/workflows-config.json' )
     fi
+    echo "CONFIG=$CONFIG" >> $GITHUB_ENV
+    echo "Workflow config: $CONFIG"
 ```
 
-Then, further in the workflow any step can use $SETTINGS variable and read any configuration properties like:
+Then, further in the workflow any step can use `${{ env.CONFIG }}` variable and read any configuration properties like:
 
 ```bash
-$(echo ${{ env.SETTINGS }} | jq ".propertyName")
+AS_PR=$(echo '${{ env.CONFIG }}' | jq -r ".pushAsPullRequest")
+```
+
+If the workflow can be also triggered manually, it is usually useful to provide a way to use custom config for such runs, for example:
+
+```yml
+on:
+  workflow_dispatch:
+    inputs:
+      config:
+        description: 'Config'
+        required: false
+        default: ''
+
+...
+
+- name: Read config
+  run: |
+    CONFIG='{}'
+    if [[ ! -z '${{ github.event.inputs.config }}' ]]; then
+      CONFIG='${{ github.event.inputs.config }}'
+    elif [[ -f "./.github/workflows-config.json" ]]; then
+      CONFIG=$( jq -c .setupWorkflows './.github/workflows-config.json' )
+    fi
+    echo "CONFIG=$CONFIG" >> $GITHUB_ENV
+    echo "Workflow config: $CONFIG"
 ```
 
 ## Available workflows
