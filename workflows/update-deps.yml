@@ -19,26 +19,20 @@ jobs:
         deps: [production, dev-only]
 
     steps:
+      - name: Checkout default branch
+        # https://github.com/marketplace/actions/checkout
+        uses: actions/checkout@v2
+
       - name: Read config
         run: |
           CONFIG='{}'
           if [[ ! -z '${{ github.event.inputs.config }}' ]]; then
             CONFIG='${{ github.event.inputs.config }}'
           elif [[ -f "./.github/workflows-config.json" ]]; then
-            CONFIG=$( jq .updateDeps './.github/workflows-config.json' )
+            CONFIG=$( jq -c .updateDeps './.github/workflows-config.json' )
           fi
           echo "CONFIG=$CONFIG" >> $GITHUB_ENV
           echo "Workflow config: $CONFIG"
-
-      - name: Setup node
-        # https://github.com/marketplace/actions/setup-node-js-environment
-        uses: actions/setup-node@v1
-        with:
-          node-version: '12'
-
-      - name: Fetch changes
-        # https://github.com/marketplace/actions/checkout
-        uses: actions/checkout@v2
 
       - name: Check env variables
         run: |

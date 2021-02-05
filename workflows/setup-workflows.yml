@@ -15,22 +15,22 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Checkout default branch
+        # https://github.com/marketplace/actions/checkout
+        uses: actions/checkout@v2
+        with:
+          token: ${{ secrets.GH_WORKFLOWS_TOKEN }}
+
       - name: Read config
         run: |
           CONFIG='{}'
           if [[ ! -z '${{ github.event.inputs.config }}' ]]; then
             CONFIG='${{ github.event.inputs.config }}'
           elif [[ -f "./.github/workflows-config.json" ]]; then
-            CONFIG=$( jq .setupWorkflows './.github/workflows-config.json' )
+            CONFIG=$( jq -c .setupWorkflows './.github/workflows-config.json' )
           fi
           echo "CONFIG=$CONFIG" >> $GITHUB_ENV
           echo "Workflow config: $CONFIG"
-
-      - name: Checkout default branch
-        # https://github.com/marketplace/actions/checkout
-        uses: actions/checkout@v2
-        with:
-          token: ${{ secrets.GH_WORKFLOWS_TOKEN }}
 
       - name: Checkout common workflows repository
         # https://github.com/marketplace/actions/checkout
