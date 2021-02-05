@@ -58,13 +58,14 @@ jobs:
       - name: Prepare PR branch
         if: env.HAS_CHANGES == 1
         run: |
-          echo "BRANCH_NAME=${{ github.ref }}" >> $GITHUB_ENV
-          pushAsPullRequest=$(echo ${{ env.SETTINGS }} | jq ".pushAsPullRequest")
-          if [[ "$pushAsPullRequest" == true ]]; then
+          BRANCH_NAME='${{ github.ref }}'
+          AS_PR=$(echo '${{ env.CONFIG }}' | jq -r ".pushAsPullRequest")
+          if [[ "$AS_PR" == "true" ]]; then
+            BRANCH_NAME="t/setup-workflows-update_$BRANCH_NAME"
             echo "AS_PR=1" >> $GITHUB_ENV
-            echo "BRANCH_NAME=t/setup-workflows-update" >> $GITHUB_ENV
-            git checkout -b t/setup-workflows-update
+            git checkout -b t/$BRANCH_NAME
           fi
+          echo "BRANCH_NAME=$BRANCH_NAME" >> $GITHUB_ENV
 
       - name: Add changes
         if: env.HAS_CHANGES == 1
