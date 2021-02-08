@@ -14,12 +14,12 @@
 
 #put to variable https://stackoverflow.com/questions/2559076/how-do-i-redirect-output-to-a-variable-in-shell
 
-bSha=$( gh api /repos/ckeditor/workflow-tests-PR-6/git/refs/heads | jq -c '.[] | select(.ref | contains("refs/heads/master"))' | jq -c '.object.sha' )
+bSha=$( gh api /repos/ckeditor/workflow-tests-PR-6/git/refs/heads | jq -c '.[] | select(.ref | contains("refs/heads/master"))' | jq -c -r '.object.sha' )
 
 echo ${bSha}
 
 #create branch on workflow test repo
-# gh api --method POST /repos/ckeditor/workflow-tests-PR-6/git/refs/heads/sc/featureA
+gh api --method POST -F ref="refs/heads/testBRANCH" -F sha=${bSha} /repos/ckeditor/workflow-tests-PR-6/git/refs
 
 
 
