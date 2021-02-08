@@ -5,4 +5,6 @@
 # https://stedolan.github.io/jq/download/
 #gh api /repos/ckeditor/workflow-tests-PR-6/actions/workflows | jq -c ".workflows | map({ name: .name, id: .id }) | .[]"
 
-gh api --method POST -F ref="master" /repos/ckeditor/workflow-tests-PR-6/actions/workflows/5661822/dispatches
+#gh api --method POST -F ref="master" /repos/ckeditor/workflow-tests-PR-6/actions/workflows/5661822/dispatches | jq -c ".workd"
+
+#gh api /repos/ckeditor/workflow-tests-PR-6/actions/runs | jq -c ".workflow_runs | map({ name: .name, id: .id, status: .status, conclusion: .conclusion }) | .[]"
