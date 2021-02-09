@@ -31,20 +31,50 @@
 
 #put all files in workflow to testing repo new branch '.github/workflows` & cfg file to `.github`
 #https://docs.github.com/en/rest/reference/repos#create-or-update-file-contents
-#stalebotContent=$( base64 workflows/stalebot.yml )
-#gh api --method PUT -F branch="testBRANCH" -F message="update stalebot" /repos/ckeditor/workflow-tests-PR-6/contents/.github/workflows/stalebot.yml -F content="${stalebotContent}"
+workflowFiles=( ./workflows/*)
+
+for file in ${workflowFiles[@]}
+do
+    stalebotContent=$( base64 $file )
+    # echo $file
+    make a proper url and send!
+    apiUrl = "/repos/ckeditor/workflow-tests-PR-6/contents/.github/k"
+    
+    gh api --method PUT -F branch="testBRANCH" -F message="Update workflow file" /repos/ckeditor/workflow-tests-PR-6/contents/.github/k -F content="${stalebotContent}"
+done
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 # Get actions list
-# https://stedolan.github.io/jq/download/
-actionList=$( gh api /repos/ckeditor/workflow-tests-PR-6/actions/workflows | jq -c ".workflows | map(.id) | .[]" )
-# echo ${actionList}
+# actionList=$( gh api /repos/ckeditor/workflow-tests-PR-6/actions/workflows | jq -c ".workflows | map(.id) | .[]" )
 
-for actionId in "${actionList[@]}"
-do
-    #dispatch workflows
-    gh api --method POST -F ref="master" /repos/ckeditor/workflow-tests-PR-6/actions/workflows/$actionId/dispatches | jq -c ".workd"
-done
+# for actionId in "${actionList[@]}"
+# do
+#     #dispatch workflows
+#     gh api --method POST -F ref="master" /repos/ckeditor/workflow-tests-PR-6/actions/workflows/$actionId/dispatches | jq -c ".workd"
+# done
 
 
 #list running actions
