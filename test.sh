@@ -37,10 +37,10 @@ for file in ${workflowFiles[@]}
 do
     stalebotContent=$( base64 $file )
     # echo $file
-    make a proper url and send!
-    apiUrl = "/repos/ckeditor/workflow-tests-PR-6/contents/.github/k"
-    
-    gh api --method PUT -F branch="testBRANCH" -F message="Update workflow file" /repos/ckeditor/workflow-tests-PR-6/contents/.github/k -F content="${stalebotContent}"
+    #make a proper url and send!
+    apiUrl="/repos/ckeditor/workflow-tests-PR-6/contents/.github/${file:1}"
+    #echo $apiUrl 
+    gh api --method PUT $apiUrl -F branch="testBRANCH" -F message="Update workflow file" -F content="${stalebotContent}"
 done
 
 
