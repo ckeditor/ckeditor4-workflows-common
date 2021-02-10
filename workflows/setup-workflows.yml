@@ -58,7 +58,7 @@ jobs:
       - name: Prepare PR branch
         if: env.HAS_CHANGES == 1
         run: |
-          BRANCH_SOURCE='${{ github.ref }}'
+          BRANCH_SOURCE=$(git rev-parse --abbrev-ref HEAD)
           AS_PR=$(echo '${{ env.CONFIG }}' | jq -r ".pushAsPullRequest")
           if [[ "$AS_PR" == "true" ]]; then
             BRANCH_SOURCE="t/setup-workflows-update_$BRANCH_SOURCE"
