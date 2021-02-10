@@ -110,4 +110,4 @@ Workflow responsible for updating NPM dependencies. It is run once a week (at 05
 
 #### Optional configuration
 
-* `updateDeps.branchMain` : `String` Target branch name. By default, workflow runs on main repository branch.
+* `updateDeps.targetBranch` : `String` Target branch name. By default, workflow runs on main repository branch.

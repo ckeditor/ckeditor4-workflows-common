@@ -44,17 +44,17 @@ jobs:
             echo "Expected 'GH_BOT_EMAIL' secret variable to be set."
             exit 1
           fi
-          BRANCH_MAIN=$(echo '${{ env.CONFIG }}' | jq -r ".branchMain")
-          if [[ -z "$BRANCH_MAIN" || "$BRANCH_MAIN" == "null" ]]; then
+          BRANCH_TARGET=$(echo '${{ env.CONFIG }}' | jq -r ".targetBranch")
+          if [[ -z "$BRANCH_TARGET" || "$BRANCH_TARGET" == "null" ]]; then
             # Since 'Fetch changes' step fetches default branch, we just get branch name (which will be default one).
-            BRANCH_MAIN=$(git rev-parse --abbrev-ref HEAD)
+            BRANCH_TARGET=$(git rev-parse --abbrev-ref HEAD)
           fi
-          echo "BRANCH_MAIN=$BRANCH_MAIN" >> $GITHUB_ENV
+          echo "BRANCH_TARGET=$BRANCH_TARGET" >> $GITHUB_ENV
 
       - name: Check if update branch already exists
         run: |
-          echo "BRANCH_UPDATE=deps-update_${{ env.BRANCH_MAIN }}_${{ matrix.deps }}" >> $GITHUB_ENV
-          if [[ $(git ls-remote --heads | grep deps-update_${{ env.BRANCH_MAIN }}_${{ matrix.deps }} | wc -c) -ne 0 ]]; then
+          echo "BRANCH_UPDATE=deps-update_${{ env.BRANCH_TARGET }}_${{ matrix.deps }}" >> $GITHUB_ENV
+          if [[ $(git ls-remote --heads | grep deps-update_${{ env.BRANCH_TARGET }}_${{ matrix.deps }} | wc -c) -ne 0 ]]; then
             echo "BRANCH_UPDATE=0" >> $GITHUB_ENV
           fi
 
@@ -69,7 +69,7 @@ jobs:
       - name: Add changes
         if: env.BRANCH_UPDATE != 0
         run: |
-          if [[ $(git diff origin/${{ env.BRANCH_MAIN }} | wc -c) -ne 0 ]]; then
+          if [[ $(git diff origin/${{ env.BRANCH_TARGET }} | wc -c) -ne 0 ]]; then
             git config --local user.email "${{ secrets.GH_BOT_EMAIL }}"
             git config --local user.name "${{ secrets.GH_BOT_USERNAME }}"
             git add package*.json
@@ -91,7 +91,7 @@ jobs:
         uses: repo-sync/pull-request@v2
         with:
           source_branch: "${{ env.BRANCH_UPDATE }}"
-          destination_branch: "${{ env.BRANCH_MAIN }}"
+          destination_branch: "${{ env.BRANCH_TARGET }}"
           pr_title: "Update NPM ${{ matrix.deps }} dependencies"
           pr_body: "Updated NPM ${{ matrix.deps }} dependencies."
           github_token: ${{ secrets.GITHUB_TOKEN }}
