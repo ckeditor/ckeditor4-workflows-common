@@ -19,6 +19,12 @@ jobs:
         deps: [production, dev-only]
 
     steps:
+      - name: Setup node
+        # https://github.com/marketplace/actions/setup-node-js-environment
+        uses: actions/setup-node@v1
+        with:
+          node-version: '12'
+
       - name: Checkout default branch
         # https://github.com/marketplace/actions/checkout
         uses: actions/checkout@v2
