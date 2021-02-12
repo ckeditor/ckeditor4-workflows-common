@@ -31,17 +31,20 @@ do
     gh api --method PUT $apiUrl -F branch="master" -F message="Update ${file:2} file" -F content="${stalebotContent}"
 done
 
+sleep 3
+
 printf "\nGather actions\n"
 # Get actions list
 actionList=$( gh api /repos/ckeditor/workflow-tests-PR-6/actions/workflows | jq -c ".workflows | map(.id) | .[]" )
 
 echo $actionList
+
 printf "\nDispatach actions\n"
 # Dispatach all available workflows
-for actionId in "${actionList[@]}"
+for actionId in ${actionList[@]}
 do
     #dispatch workflows
-    gh api --method POST -F ref="master" /repos/ckeditor/workflow-tests-PR-6/actions/workflows/$actionId/dispatches
-    #| jq -c ".workd"
+    apiUrl="/repos/ckeditor/workflow-tests-PR-6/actions/workflows/${actionId}/dispatches"
+    gh api --method POST -F ref="master" $apiUrl
 done
 
