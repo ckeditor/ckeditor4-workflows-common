@@ -1,8 +1,45 @@
 # Assume that testing repo has first "empty" commit
-TESTING_REPO="ckeditor/workflow-tests-PR-6"
+TESTING_REPO="cksource/workflow-tests-PR-6"
 
 # Hardcoded initial empty commit
 bSha="ae15364ec3c7cceb7a0624284e4627cc1088ad99"
+
+printf "\nGather running actions\n"
+
+stopVerification=0
+
+function VerifyActions {
+	printf "\n RETRY \n"
+	#https://docs.github.com/en/rest/reference/actions#list-workflow-runs-for-a-repository
+	repoActions=$( gh api /repos/$TESTING_REPO/actions/runs | jq -c ".workflow_runs | map({status: .status, conclusion: .conclusion, id:.id}) | .[]" )
+
+
+	for action in ${repoActions[@]}
+	do
+
+		echo $action[0]
+	done
+
+	# Prevents infinite checks...
+	stopVerification=$((stopVerification+1))
+	if [ $stopVerification == 5 ]; then
+		echo "checks reach max"
+		exit
+	fi
+
+	sleep 5
+	VerifyActions
+}
+
+VerifyActions 
+
+exit 3;
+
+
+
+
+
+
 
 printf "\nReset master branch to initial commit\n"
 gh api --method PATCH -F sha=$bSha -F force="true" /repos/$TESTING_REPO/git/refs/heads/master
