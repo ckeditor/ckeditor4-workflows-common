@@ -58,6 +58,13 @@ jobs:
         # https://github.com/marketplace/actions/cancel-this-build
         uses: andymckay/cancel-action@0.2
 
+      - name: Wait for cancellation
+        if: env.SHOULD_CANCEL == 1
+        # https://github.com/marketplace/actions/wait-sleep
+        uses: jakejarvis/wait-action@master
+        with:
+          time: '60s'
+
       - name: Checkout common workflows repository
         # https://github.com/marketplace/actions/checkout
         uses: actions/checkout@v2
