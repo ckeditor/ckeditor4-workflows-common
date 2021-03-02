@@ -18,7 +18,6 @@ const filesList = [
             dest: '.github/workflows-config.json' 
         },
 ]
-}
 
 async function CommitFile( sha, content, filePath, branch ) {
     const result = await request('PUT /repos/{owner}/{repo}/contents/{path}', {
