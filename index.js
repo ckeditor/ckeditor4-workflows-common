@@ -1,6 +1,7 @@
 'use strict';
 
-const { request } = require( '@octokit/request' );
+const GitHubClient = require ( './github-client' );
+
 require( 'dotenv' ).config();
 const SendFiles = require( './before-each' );
 
@@ -11,7 +12,7 @@ const tests = {
 		filesList: [
 			{
 				src: 'workflows/setup-workflows.yml',
-			   dest: '.github/workflows/setup-workflows.yml'
+				dest: '.github/workflows/setup-workflows.yml'
 			},
 			{
 				src: 'workflows-config.json',
@@ -36,17 +37,16 @@ for( const testName in tests ) {
 					GetRunningActions()
 					.then( results => {
 						const wf =results.data.workflow_runs[0];
-						// const { id, conclusion, status, name, created_at, updated_at } = wf;
 						RecheckAction( wf);
 					} );
-				}, 1000);
+				}, 2000);
 			} )
 			.catch( why => console.log( 'ERROR', why ) );
 	} );
 }
 
 async function GetRunningActions() {
-	const result = await request( 'GET /repos/{owner}/{repo}/actions/runs', {
+	const result = await GitHubClient.request( 'GET', '/repos/{owner}/{repo}/actions/runs', {
 		headers: {
 			authorization: 'token ' + process.env.AUTH_KEY
 		},
@@ -58,19 +58,21 @@ async function GetRunningActions() {
 }
 
 async function GetWorkflowRun( workflowId ) {
-	const result = await request( 'GET /repos/{owner}/{repo}/actions/runs/{run_id}', {
-		headers: {
-			authorization: 'token ' + process.env.AUTH_KEY
-		},
-		owner: process.env.OWNER ,
-		repo: process.env.REPO,
-		run_id: workflowId
-	  });
+	const result = await GitHubClient.request(
+		'GET',
+		'/repos/{owner}/{repo}/actions/runs/{run_id}',
+		{
+			headers: {
+				authorization: 'token ' + process.env.AUTH_KEY
+			},
+			owner: process.env.OWNER ,
+			repo: process.env.REPO,
+			run_id: workflowId
+		}
+	);
 
 	return result;
 }
-
-let allCompletedActions = [];
 
 let dots = '.';
 let waitingTime = 1000;
@@ -95,15 +97,19 @@ function RecheckAction(wfObject) {
 }
 
 async function DispatchWorkflow( workflowId, branch ) {
-	const result = await request( 'POST /repos/{owner}/{repo}/actions/workflows/{workflow_id}/dispatches', {
-		headers: {
-			authorization: 'token ' + process.env.AUTH_KEY
-		},
-		owner: process.env.OWNER ,
-		repo: process.env.REPO,
-		workflow_id: workflowId,
-		ref: branch
-	  });
+	const result = await GitHubClient.request(
+		'POST',
+		'/repos/{owner}/{repo}/actions/workflows/{workflow_id}/dispatches',
+		{
+			headers: {
+				authorization: 'token ' + process.env.AUTH_KEY
+			},
+			owner: process.env.OWNER ,
+			repo: process.env.REPO,
+			workflow_id: workflowId,
+			ref: branch
+		}
+	);
 
 	return result;
 }
