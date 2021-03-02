@@ -1,10 +1,59 @@
+'use strict';
+
 const { request } = require( '@octokit/request' );
 require( 'dotenv' ).config();
+const SendFile = require( './before-each' );
 
-console.log();
+const tests = {
+    'test setup-workflows': {
+        name: 'setup-workflows.yml',
+        branch: 'master',
+        filesList: [
+            {
+                src: 'workflows/setup-workflows.yml',
+               dest: '.github/workflows/setup-workflows.yml' 
+            },
+            // {
+            //     src: 'workflows-config.json',
+            //     dest: '.github/workflows-config.json' 
+            // },
+        ]
+    }
+};
+
+for( const testName in tests ) {
+    console.log( 'Running: ' + testName );
+    const testCase = tests[ testName ];
+
+    
+    const sends = testCase.filesList.map( entry => {
+        SendFile( testCase.branch, entry.src, entry.dest );
+    } );
+
+    Promise.all( sends ).then( x => {
+        console.log( 'all sends finished', x );
+
+        DispatchWorkflow( testCase.name,testCase.branch )
+            .then( res => {
+                // GH need some time before actually workflow is available as `quened`
+                setTimeout( () => {
+                    GetRunningActions()
+                    .then( results => {
+                        const wf =results.data.workflow_runs[0];
+                        // const { id, conclusion, status, name, created_at, updated_at } = wf;
+                        RecheckAction( wf);
+                    } );
+                }, 1000);
+            } )
+            .catch( why => console.log( 'ERROR', why ) );
+    } );
+}
 
 async function GetRunningActions() {
-    const result = await request('GET /repos/{owner}/{repo}/actions/runs', {
+    const result = await request( 'GET /repos/{owner}/{repo}/actions/runs', {
+        headers: {
+            authorization: 'token ' + process.env.AUTH_KEY
+        },
         owner: process.env.OWNER ,
         repo: process.env.REPO
       });
@@ -13,7 +62,10 @@ async function GetRunningActions() {
 }
 
 async function GetWorkflowRun( workflowId ) {
-    const result = await request('GET /repos/{owner}/{repo}/actions/runs/{run_id}', {
+    const result = await request( 'GET /repos/{owner}/{repo}/actions/runs/{run_id}', {
+        headers: {
+            authorization: 'token ' + process.env.AUTH_KEY
+        },
         owner: process.env.OWNER ,
         repo: process.env.REPO,
         run_id: workflowId
@@ -21,54 +73,40 @@ async function GetWorkflowRun( workflowId ) {
 
     return result;
 }
+
 let allCompletedActions = [];
 
-function RecheckActions(actions) {
-    const completedActions = actions.filter( action => action.status === "completed" );
-    allCompletedActions = [...allCompletedActions, ...completedActions];
+let dots = '.';
+let waitingTime = 1000;
 
+function RecheckAction(wfObject) {
+    if(wfObject.status === "completed"){
+        console.log("Completed &&  ::: " + wfObject.conclusion );
+        return;
+    }
+    dots += '.'
+    waitingTime += 3500;
+    console.log( wfObject.status + ' :: ' + wfObject.conclusion );
+    console.log( 'Let me check again' + dots);
 
-    const inprogressActions = actions.filter( action => action.status !== "completed" );
-
-    //  nieskończone dodaj do następnej kolejki sprawdzania
-    const awaitedActions = inprogressActions.map(GetWorkflowRun);
-
-    Promise.all( ...awaitedActions ).then( values => {    
-        RecheckActions(values);
-    });
+    GetWorkflowRun(wfObject.id)
+        .then( workflow => {
+            // Give some time between rechecks
+            setTimeout( () => {
+                RecheckAction( workflow.data );
+            }, waitingTime);
+        });
 }
+async function DispatchWorkflow( workflowId, branch ) {
+    const result = await request( 'POST /repos/{owner}/{repo}/actions/workflows/{workflow_id}/dispatches', {
+        headers: {
+            authorization: 'token ' + process.env.AUTH_KEY
+        },
+        owner: process.env.OWNER ,
+        repo: process.env.REPO,
+        workflow_id: workflowId,
+        ref: branch
+      });
 
-GetRunningActions()
-.then( (res) => {
-
-    RecheckActions(res.data.workflow_runs);
-
-    // //Gather all actions that are completed
-    // //zbierz ponownie wyniki z inprogressActions
-    // //  skończone dodaj do completedActions
-    // let completedActions = res.data.workflow_runs.filter( action => action.status === "completed" );
-    // const inprogressActions = res.data.workflow_runs.filter( action => action.status !== "completed" );
-
-    // //  nieskończone dodaj do następnej kolejki sprawdzania
-    // const awaitedActions = inprogressActions.map(GetWorkflowRun);
-
-    // Promise.all( ...awaitedActions ).then( values => {
-    //     const completed = values.filter(action => action.status === "completed");
-    //     completedActions = [...completedActions, ...completed];
-
-    //     const incompleted = values.filter(action => action.status !== "completed");
-    //     ...
-    // });
-
-
-    //powtarzaj cykl aż minie dużo czasu -> expired
-    //OR aż wszystkie bedą skońćzone
-
-
-
-    console.log(res.data.workflow_runs);
-} )
-.catch( ( { message, name, status } ) => {
-    console.log( message, name, status );
-}); 
-
+    return result;
+}
