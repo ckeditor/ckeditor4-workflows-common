@@ -25,7 +25,6 @@ for( const testName in tests ) {
 	console.log( 'Running: ' + testName );
 	const testCase = tests[ testName ];
 
-   debugger
 	SendFiles( testCase.branch, testCase.filesList)
 	.then( x => {
 		console.log( 'all sends finished', x );
