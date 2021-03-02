@@ -2,7 +2,7 @@
 
 const { request } = require( '@octokit/request' );
 require( 'dotenv' ).config();
-const SendFile = require( './before-each' );
+const SendFiles = require( './before-each' );
 
 const tests = {
     'test setup-workflows': {
@@ -13,10 +13,10 @@ const tests = {
                 src: 'workflows/setup-workflows.yml',
                dest: '.github/workflows/setup-workflows.yml' 
             },
-            // {
-            //     src: 'workflows-config.json',
-            //     dest: '.github/workflows-config.json' 
-            // },
+            {
+                src: 'workflows-config.json',
+                dest: '.github/workflows-config.json' 
+            },
         ]
     }
 };
@@ -25,12 +25,9 @@ for( const testName in tests ) {
     console.log( 'Running: ' + testName );
     const testCase = tests[ testName ];
 
-    
-    const sends = testCase.filesList.map( entry => {
-        SendFile( testCase.branch, entry.src, entry.dest );
-    } );
-
-    Promise.all( sends ).then( x => {
+   debugger 
+    SendFiles( testCase.branch, testCase.filesList)
+    .then( x => {
         console.log( 'all sends finished', x );
 
         DispatchWorkflow( testCase.name,testCase.branch )
@@ -97,6 +94,7 @@ function RecheckAction(wfObject) {
             }, waitingTime);
         });
 }
+
 async function DispatchWorkflow( workflowId, branch ) {
     const result = await request( 'POST /repos/{owner}/{repo}/actions/workflows/{workflow_id}/dispatches', {
         headers: {

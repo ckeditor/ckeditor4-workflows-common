@@ -5,6 +5,7 @@ const fs = require( 'fs' )
 const path = require( 'path' )
 const { spawn } = require("child_process");
 const { request } = require( '@octokit/request' );
+const { rejects } = require('assert');
 
 const tmpRepoPath = path.join( process.cwd(), 'tmp' );
 
@@ -68,14 +69,24 @@ function SendFile(branch, sourceFilePath, destinationFilePath) {
                 console.log(why);
                 console.log( 'an catch occured', why.status, why.name)
                 
-            })
+            } );
 
 
         } )
-        .catch(why => console.warn( 'File not found' ))
-    })
+        .catch(why => console.warn( 'File not found' ) );
+    } )
 }
 
-// SendFile( 'master', 'workflows-config.json', '.github/workflows-config.json' );
+function SendFiles( branch, files ) {
+console.log('runned wiht', files);
+    const nextFile = files.shift();
 
-module.exports = SendFile;
+    if(nextFile) {
+        return SendFile( branch, nextFile.src, nextFile.dest )
+                .then( r => SendFiles( branch, files ) );
+    } else {
+        return Promise.resolve();
+    }
+}
+
+module.exports = SendFiles;
