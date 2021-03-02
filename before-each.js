@@ -4,6 +4,13 @@ require( 'dotenv' ).config();
 const fs = require('fs')
 const path = require('path')
 const { spawn } = require("child_process");
+const { request } = require( '@octokit/request' );
+
+// request.defaults({
+//     headers: {
+//         authorization: process.env.AUTH_KEY
+//     }
+// })
 
 const tmpRepoPath = path.join( process.cwd(), 'tmp' );
 
@@ -18,6 +25,7 @@ const filesList = [
         },
 ]
 console.log(tmpRepoPath);
+function giting(){
 
 // .then(x =>  runCmd( 'rm', [ '-rf', '*' ], { cwd: tmpRepoPath } ) )
 runCmd( 'rm', [ '-rf', 'tmp' ] )
@@ -60,3 +68,54 @@ runCmd( 'rm', [ '-rf', 'tmp' ] )
         });
     });
 }
+}
+
+async function CommitFile( sha, content, filePath, branch ) {
+    const result = await request('PUT /repos/{owner}/{repo}/contents/{path}', {
+        headers: {
+            authorization: 'token ' + process.env.AUTH_KEY
+        },
+        owner: process.env.OWNER ,
+        repo: process.env.REPO,
+        path: filePath,
+        branch: branch,
+        sha: sha,
+        content: content,
+        message: 'Update file ' + filePath,
+        auth: process.env.AUTH_KEY
+      });
+
+    return result;
+}
+
+
+//get file from repo to get sha to update it
+async function GetFile( path, branch ) {
+    const result = await request('GET /repos/{owner}/{repo}/contents/{path}?ref={ref}', {
+        owner: process.env.OWNER ,
+        repo: process.env.REPO,
+        path: path,
+        ref: branch,
+      });
+
+    return result;
+}
+
+
+const branch = 'master';
+const filePath = '.github/workflows-config.json';
+const newContent = fs.readFileSync('workflows-config.json', {
+    encoding: 'base64'
+});
+
+GetFile(filePath, branch)
+    .then( res => res.data.sha)
+    .then( sha => {
+
+        CommitFile(sha, newContent, filePath, branch)
+        .then(res => console.log(res))
+        .catch(why => console.log('an catch occured', why.status, why.name, why.request))
+
+    } )
+    .catch(why => console.warn('File not found'))
+
