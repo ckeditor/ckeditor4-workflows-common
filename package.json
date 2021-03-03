@@ -18,6 +18,7 @@
   "homepage": "https://github.com/ckeditor/ckeditor4-workflows-common#readme",
   "dependencies": {
     "@octokit/request": "^5.4.14",
-    "dotenv": "^8.2.0"
+    "dotenv": "^8.2.0",
+    "chalk": "^4.1.0"
   }
 }

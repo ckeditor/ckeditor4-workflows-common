@@ -1,8 +1,8 @@
-
-require( 'dotenv' ).config();
-
 const fs = require( 'fs' ),
+	dotenv = require( 'dotenv' ),
 	GitHubClient = require ( './github-client' );
+
+dotenv.config();
 
 async function CommitFile( sha, content, filePath, branch ) {
 	const result = await GitHubClient.request( 'PUT', '/repos/{owner}/{repo}/contents/{path}', {
@@ -36,7 +36,7 @@ async function GetFile( path, branch ) {
 }
 
 function SendFile(branch, sourceFilePath, destinationFilePath) {
-	return new Promise( ( res, rej ) => {
+	return new Promise( ( resolve, reject ) => {
 
 	const newContent = fs.readFileSync( sourceFilePath, {
 		encoding: 'base64'
@@ -47,14 +47,14 @@ function SendFile(branch, sourceFilePath, destinationFilePath) {
 		.then( sha => {
 			CommitFile( sha, newContent, destinationFilePath, branch )
 				.then( result => {
-					res( result );
+					resolve( result );
 				})
-				.catch( why => {
-					console.log( why );
-					console.log( 'An catch occured', why.status, why.name);
+				.catch( reason => {
+					console.log( reason );
+					console.log( 'An catch occured', reason.status, reason.name);
 				} );
 		} )
-		.catch( why => console.warn( 'File not found' ) );
+		.catch( _ => console.warn( 'File not found' ) );
 	} );
 }
 
@@ -62,7 +62,7 @@ function SendFiles( branch, files ) {
 	const nextFile = files.shift();
 
 	if( nextFile ) {
-		return SendFile( branch, nextFile.src, nextFile.dest ).then( r => SendFiles( branch, files ) );
+		return SendFile( branch, nextFile.src, nextFile.dest ).then( _ => SendFiles( branch, files ) );
 	} else {
 		return Promise.resolve();
 	}
