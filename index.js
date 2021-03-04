@@ -6,9 +6,9 @@ const dotenv = require( 'dotenv' ),
 	SendFiles = require( './before-each' );
 
 dotenv.config();
-
-const tests = {
-	'test setup-workflows': {
+const allTestsResults = [];
+const tests = [
+	{
 		name: 'setup-workflows.yml',
 		branch: 'master',
 		filesList: [
@@ -21,36 +21,75 @@ const tests = {
 				dest: '.github/workflows-config.json'
 			},
 		]
+	},
+	{
+		name:'update-deps.yml',
+		branch: 'master',
+		filesList: [
+			{
+				src: 'workflows/update-deps.yml',
+				dest: '.github/workflows/update-deps.yml'
+			}
+		]
 	}
-};
+];
 
-RunTests(tests);
+RunTests( tests );
 
-function RunTests( tests ) {
-	for( const testName in tests ) {
-		console.log( 'Running test for: ' + chalk.blue( testName ) );
-		const testCase = tests[ testName ];
+async function RunTests( tests ) {
+	const testCase = tests.shift();
 
-		SendFiles( testCase.branch, testCase.filesList )
-		.then( _ => {
-			console.log( 'All files pushed to repo at ' + chalk.blue( testCase.branch ) + ' branch' );
-
-			DispatchWorkflow( testCase.name,testCase.branch )
-				.then( res => {
-					// GH need some time before workflow is actually available as `queued`
-					setTimeout( () => {
-						GetRunningActions()
-							.then( actions => {
-								// First action is the latest one - recently dispatched
-								const workflow = actions.data.workflow_runs[0];
-								console.log( 'Verify status of: ' + chalk.blue( workflow.name ) );
-								VerifyWorkflowStatus( workflow );
-							} );
-					}, 2000);
-				} )
-				.catch( reason => console.log( 'ERROR', reason ) );
-		} );
+	if( testCase ) {
+		console.log( 'Running test for: ' + chalk.blue( testCase.name ) );
+		await RunTest( testCase );
+		return RunTests( tests );
+	} else {
+		return Promise.resolve();
 	}
+}
+
+async function RunTest( testCase ) {
+	return new Promise( async ( resolve, reject ) => {
+		await SendFiles( testCase.branch, testCase.filesList );
+
+		console.log( 'All files pushed to repo at ' + chalk.blue( testCase.branch ) + ' branch' );
+
+		await DispatchWorkflow( testCase.name,testCase.branch );
+
+		// GH need some time before workflow is actually available as `queued`
+		setTimeout( async () => {
+			const actions = await GetRunningActions();
+
+			// First action is the latest one - recently dispatched
+			const workflow = actions.data.workflow_runs[0];
+			console.log( 'Verify status of: ' + chalk.blue( workflow.name ) );
+
+			await VerifyWorkflowStatus( workflow );
+			resolve();
+		}, 2000);
+	} );
+}
+
+function VerifyWorkflowStatus(workflowObject, waitingTime) {
+	return new Promise( ( resolve, reject ) => {
+		if( workflowObject.status === 'completed' ) {
+			console.log( chalk.green( `${workflowObject.name} run is finished!` ) + ' Result: ' + chalk.yellow( workflowObject.conclusion ) );
+
+			resolve();
+			return;
+		}
+		waitingTime = waitingTime || 1000;
+
+		console.log( 'status: ' + chalk.yellow( workflowObject.status ) + '. Result: ' + chalk.yellow( workflowObject.conclusion ) );
+		console.log( `Next check in ${waitingTime}ms` );
+
+		setTimeout( async () => {
+			const workflow = await GetWorkflowRun( workflowObject.id );
+			// Give some time between rechecks
+			await VerifyWorkflowStatus( workflow.data, waitingTime + 3500 );
+			resolve();
+		}, waitingTime );
+	} );
 }
 
 async function GetRunningActions() {
@@ -80,25 +119,6 @@ async function GetWorkflowRun( workflowId ) {
 	);
 
 	return result;
-}
-
-function VerifyWorkflowStatus(workflowObject, waitingTime) {
-	if(workflowObject.status === "completed"){
-		console.log( chalk.green( `${workflowObject.name} run is finished!` ) + ' Result: ' + chalk.yellow( workflowObject.conclusion ) );
-		return;
-	}
-	waitingTime = waitingTime || 1000;
-
-	console.log( 'status: ' + chalk.yellow( workflowObject.status ) + '. Result: ' + chalk.yellow( workflowObject.conclusion ) );
-	console.log( `Next check in ${waitingTime}ms` );
-
-	GetWorkflowRun( workflowObject.id )
-		.then( workflow => {
-			// Give some time between rechecks
-			setTimeout( () => {
-				VerifyWorkflowStatus( workflow.data, waitingTime + 3500 );
-			}, waitingTime );
-		});
 }
 
 async function DispatchWorkflow( workflowId, branch ) {
