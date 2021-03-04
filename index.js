@@ -54,7 +54,7 @@ async function RunTest( testCase ) {
 
 		console.log( 'All files pushed to repo at ' + chalk.blue( testCase.branch ) + ' branch' );
 
-		await DispatchWorkflow( testCase.name,testCase.branch );
+		await DispatchWorkflow( testCase.name, testCase.branch, testCase.input );
 
 		// GH need some time before workflow is actually available as `queued`
 		setTimeout( async () => {
@@ -121,7 +121,7 @@ async function GetWorkflowRun( workflowId ) {
 	return result;
 }
 
-async function DispatchWorkflow( workflowId, branch ) {
+async function DispatchWorkflow( workflowId, branch, input ) {
 	const result = await GitHubClient.request(
 		'POST',
 		'/repos/{owner}/{repo}/actions/workflows/{workflow_id}/dispatches',
@@ -129,10 +129,11 @@ async function DispatchWorkflow( workflowId, branch ) {
 			headers: {
 				authorization: 'token ' + process.env.AUTH_KEY
 			},
-			owner: process.env.OWNER ,
+			owner: process.env.OWNER,
 			repo: process.env.REPO,
 			workflow_id: workflowId,
-			ref: branch
+			ref: branch,
+			inputs: input
 		}
 	);
 
