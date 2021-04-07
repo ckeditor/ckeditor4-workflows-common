@@ -1,21 +1,22 @@
 const fs = require( 'fs' );
 const GitHubClient = require ( './github-client' );
 
-async function commitFile( sha, content, filePath, branch ) {
-	const result = await GitHubClient.request( 'PUT', '/repos/{owner}/{repo}/contents/{path}', {
-		headers: {
-			authorization: 'token ' + process.env.AUTH_KEY
-		},
-		owner: process.env.OWNER ,
-		repo: process.env.REPO,
-		path: filePath,
-		branch: branch,
-		sha: sha,
-		content: content,
-		message: 'Update file ' + filePath,
+async function sendFiles( branch, files ) {
+	const nextFile = files.shift();
+
+	if( nextFile ) {
+		await sendFile( branch, nextFile.src, nextFile.dest );
+		return sendFiles( branch, files );
+	}
+}
+
+async function sendFile( branch, sourceFilePath, destinationFilePath ) {
+	const newContent = fs.readFileSync( sourceFilePath, {
+		encoding: 'base64'
 	} );
 
-	return result;
+	const file = await getFile( destinationFilePath, branch );
+	await commitFile( file.data.sha, newContent, destinationFilePath, branch );
 }
 
 async function getFile( path, branch ) {
@@ -32,22 +33,21 @@ async function getFile( path, branch ) {
 	return result;
 }
 
-async function sendFile(branch, sourceFilePath, destinationFilePath) {
-	const newContent = fs.readFileSync( sourceFilePath, {
-		encoding: 'base64'
+async function commitFile( sha, content, filePath, branch ) {
+	const result = await GitHubClient.request( 'PUT', '/repos/{owner}/{repo}/contents/{path}', {
+		headers: {
+			authorization: 'token ' + process.env.AUTH_KEY
+		},
+		owner: process.env.OWNER ,
+		repo: process.env.REPO,
+		path: filePath,
+		branch: branch,
+		sha: sha,
+		content: content,
+		message: 'Update file ' + filePath,
 	} );
 
-	const file = await getFile( destinationFilePath, branch );
-	await commitFile( file.data.sha, newContent, destinationFilePath, branch );
-}
-
-async function sendFiles( branch, files ) {
-	const nextFile = files.shift();
-
-	if( nextFile ) {
-		await sendFile( branch, nextFile.src, nextFile.dest );
-		return sendFiles( branch, files );
-	}
+	return result;
 }
 
 module.exports = sendFiles;

@@ -13,7 +13,7 @@ const tests = [
 				dest: '.github/workflows/setup-workflows.yml'
 			},
 			{
-				src: 'workflows-config.json',
+				src: 'tests/workflows-config.json',
 				dest: '.github/workflows-config.json'
 			},
 		]
