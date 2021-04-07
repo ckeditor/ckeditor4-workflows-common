@@ -111,3 +111,17 @@ Workflow responsible for updating NPM dependencies. It is run once a week (at 05
 #### Optional configuration
 
 * `updateDeps.targetBranch` : `String` Target branch name. By default, workflow runs on main repository branch.
+
+## Testing
+
+To setup tests, create `.env` file with variables:
+
+* `AUTH_KEY` - GitHub key with permissions to commit files, read and run workflows / actions
+* `OWNER` - Owner of testing repo, e.g. `ckeditor`
+* `REPO` - Testing repo name, e.g. `workflow-tests`
+
+Run command
+
+```
+npm test
+```
