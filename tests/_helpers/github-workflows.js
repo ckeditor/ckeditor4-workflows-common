@@ -1,23 +1,20 @@
-const chalk = require( 'chalk' );
 const GitHubClient = require( './github-client' );
 
-function verifyWorkflowStatus(workflowObject, waitingTime) {
+function verifyWorkflowStatus( workflowObject, reportCurrentStatus, waitingTime ) {
 	return new Promise( ( resolve, reject ) => {
 		if( workflowObject.status === 'completed' ) {
-			console.log( chalk.green( `${workflowObject.name} run is finished!` ) + ' Result: ' + chalk.yellow( workflowObject.conclusion ) );
-
-			resolve();
+			resolve( workflowObject );
 			return;
 		}
 		waitingTime = waitingTime || 1000;
 
-		console.log( `status: ${chalk.yellow( workflowObject.status )}. Result: ${chalk.yellow( workflowObject.conclusion)}. Next check in ${waitingTime}ms` );
+		reportCurrentStatus( workflowObject, waitingTime );
 
 		setTimeout( async () => {
 			const workflow = await getWorkflowRun( workflowObject.id );
 			// Give some time between rechecks
-			await verifyWorkflowStatus( workflow.data, waitingTime + 3500 );
-			resolve();
+			const result = await verifyWorkflowStatus( workflow.data, reportCurrentStatus, waitingTime + 3500 );
+			resolve( result );
 		}, waitingTime );
 	} );
 }

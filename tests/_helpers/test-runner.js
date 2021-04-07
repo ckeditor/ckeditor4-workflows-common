@@ -28,7 +28,12 @@ async function runTest( testCase ) {
 			const workflow = actions.data.workflow_runs[0];
 			console.log( 'Verify status of: ' + chalk.blue( workflow.name ) );
 
-			await verifyWorkflowStatus( workflow );
+			const result = await verifyWorkflowStatus( workflow, ( workflowObject, waitingTime ) => {
+				console.log( `Status: ${ chalk.yellow( workflowObject.status ) }. Result: ${ chalk.yellow( workflowObject.conclusion ) }. Next check in ${ waitingTime }ms` );
+			} );
+
+			console.log( chalk.green( `'${result.name}' run is finished!` ) + ' Result: ' + chalk.yellow( result.conclusion ) );
+
 			resolve();
 		}, 2000);
 	} );
