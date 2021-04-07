@@ -1,10 +1,11 @@
-const fs = require( 'fs' ),
-	dotenv = require( 'dotenv' ),
-	GitHubClient = require ( './github-client' );
+const fs = require( 'fs' );
+const dotenv = require( 'dotenv' );
+const GitHubClient = require ( './github-client' );
+const { resolve } = require('path');
 
 dotenv.config();
 
-async function CommitFile( sha, content, filePath, branch ) {
+async function commitFile( sha, content, filePath, branch ) {
 	const result = await GitHubClient.request( 'PUT', '/repos/{owner}/{repo}/contents/{path}', {
 		headers: {
 			authorization: 'token ' + process.env.AUTH_KEY
@@ -21,7 +22,7 @@ async function CommitFile( sha, content, filePath, branch ) {
 	return result;
 }
 
-async function GetFile( path, branch ) {
+async function getFile( path, branch ) {
 	const result = await GitHubClient.request( 'GET', '/repos/{owner}/{repo}/contents/{path}?ref={ref}', {
 		headers: {
 			authorization: 'token ' + process.env.AUTH_KEY
@@ -35,37 +36,22 @@ async function GetFile( path, branch ) {
 	return result;
 }
 
-function SendFile(branch, sourceFilePath, destinationFilePath) {
-	return new Promise( ( resolve, reject ) => {
-
+async function sendFile(branch, sourceFilePath, destinationFilePath) {
 	const newContent = fs.readFileSync( sourceFilePath, {
 		encoding: 'base64'
 	} );
 
-	GetFile( destinationFilePath, branch )
-		.then( res => res.data.sha)
-		.then( sha => {
-			CommitFile( sha, newContent, destinationFilePath, branch )
-				.then( result => {
-					resolve( result );
-				})
-				.catch( reason => {
-					console.log( reason );
-					console.log( 'An catch occured', reason.status, reason.name);
-				} );
-		} )
-		.catch( _ => console.warn( 'File not found' ) );
-	} );
+	const file = await getFile( destinationFilePath, branch );
+	await commitFile( file.data.sha, newContent, destinationFilePath, branch );
 }
 
-function SendFiles( branch, files ) {
+async function sendFiles( branch, files ) {
 	const nextFile = files.shift();
 
 	if( nextFile ) {
-		return SendFile( branch, nextFile.src, nextFile.dest ).then( _ => SendFiles( branch, files ) );
-	} else {
-		return Promise.resolve();
+		await sendFile( branch, nextFile.src, nextFile.dest );
+		return sendFiles( branch, files );
 	}
 }
 
-module.exports = SendFiles;
+module.exports = sendFiles;

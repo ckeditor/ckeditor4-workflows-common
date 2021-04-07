@@ -3,7 +3,7 @@
 const dotenv = require( 'dotenv' ),
 	chalk = require('chalk'),
 	GitHubClient = require ( './github-client' ),
-	SendFiles = require( './before-each' );
+	sendFiles = require( './before-each' );
 
 dotenv.config();
 const allTestsResults = [];
@@ -34,43 +34,41 @@ const tests = [
 	}
 ];
 
-RunTests( tests );
+runTests( tests );
 
-async function RunTests( tests ) {
+async function runTests( tests ) {
 	const testCase = tests.shift();
 
 	if( testCase ) {
 		console.log( 'Running test for: ' + chalk.blue( testCase.name ) );
-		await RunTest( testCase );
-		return RunTests( tests );
-	} else {
-		return Promise.resolve();
+		await runTest( testCase );
+		return runTests( tests );
 	}
 }
 
-async function RunTest( testCase ) {
+async function runTest( testCase ) {
 	return new Promise( async ( resolve, reject ) => {
-		await SendFiles( testCase.branch, testCase.filesList );
+		await sendFiles( testCase.branch, testCase.filesList );
 
 		console.log( 'All files pushed to repo at ' + chalk.blue( testCase.branch ) + ' branch' );
 
-		await DispatchWorkflow( testCase.name, testCase.branch, testCase.input );
+		await dispatchWorkflow( testCase.name, testCase.branch, testCase.input );
 
 		// GH need some time before workflow is actually available as `queued`
 		setTimeout( async () => {
-			const actions = await GetRunningActions();
+			const actions = await getRunningActions();
 
 			// First action is the latest one - recently dispatched
 			const workflow = actions.data.workflow_runs[0];
 			console.log( 'Verify status of: ' + chalk.blue( workflow.name ) );
 
-			await VerifyWorkflowStatus( workflow );
+			await verifyWorkflowStatus( workflow );
 			resolve();
 		}, 2000);
 	} );
 }
 
-function VerifyWorkflowStatus(workflowObject, waitingTime) {
+function verifyWorkflowStatus(workflowObject, waitingTime) {
 	return new Promise( ( resolve, reject ) => {
 		if( workflowObject.status === 'completed' ) {
 			console.log( chalk.green( `${workflowObject.name} run is finished!` ) + ' Result: ' + chalk.yellow( workflowObject.conclusion ) );
@@ -84,15 +82,15 @@ function VerifyWorkflowStatus(workflowObject, waitingTime) {
 		console.log( `Next check in ${waitingTime}ms` );
 
 		setTimeout( async () => {
-			const workflow = await GetWorkflowRun( workflowObject.id );
+			const workflow = await getWorkflowRun( workflowObject.id );
 			// Give some time between rechecks
-			await VerifyWorkflowStatus( workflow.data, waitingTime + 3500 );
+			await verifyWorkflowStatus( workflow.data, waitingTime + 3500 );
 			resolve();
 		}, waitingTime );
 	} );
 }
 
-async function GetRunningActions() {
+async function getRunningActions() {
 	const result = await GitHubClient.request( 'GET', '/repos/{owner}/{repo}/actions/runs', {
 		headers: {
 			authorization: 'token ' + process.env.AUTH_KEY
@@ -104,7 +102,7 @@ async function GetRunningActions() {
 	return result;
 }
 
-async function GetWorkflowRun( workflowId ) {
+async function getWorkflowRun( workflowId ) {
 	const result = await GitHubClient.request(
 		'GET',
 		'/repos/{owner}/{repo}/actions/runs/{run_id}',
@@ -121,7 +119,7 @@ async function GetWorkflowRun( workflowId ) {
 	return result;
 }
 
-async function DispatchWorkflow( workflowId, branch, input ) {
+async function dispatchWorkflow( workflowId, branch, input ) {
 	const result = await GitHubClient.request(
 		'POST',
 		'/repos/{owner}/{repo}/actions/workflows/{workflow_id}/dispatches',
