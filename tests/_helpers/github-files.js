@@ -1,9 +1,5 @@
 const fs = require( 'fs' );
-const dotenv = require( 'dotenv' );
 const GitHubClient = require ( './github-client' );
-const { resolve } = require('path');
-
-dotenv.config();
 
 async function commitFile( sha, content, filePath, branch ) {
 	const result = await GitHubClient.request( 'PUT', '/repos/{owner}/{repo}/contents/{path}', {
