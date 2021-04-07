@@ -78,8 +78,7 @@ function verifyWorkflowStatus(workflowObject, waitingTime) {
 		}
 		waitingTime = waitingTime || 1000;
 
-		console.log( 'status: ' + chalk.yellow( workflowObject.status ) + '. Result: ' + chalk.yellow( workflowObject.conclusion ) );
-		console.log( `Next check in ${waitingTime}ms` );
+		console.log( `status: ${chalk.yellow( workflowObject.status )}. Result: ${chalk.yellow( workflowObject.conclusion)}. Next check in ${waitingTime}ms` );
 
 		setTimeout( async () => {
 			const workflow = await getWorkflowRun( workflowObject.id );
