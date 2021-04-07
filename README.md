@@ -125,3 +125,10 @@ Run command
 ```
 npm test
 ```
+
+Next tests could be add in `tests/index.js`. Single test structure:
+* `name` - Name which be displayed in console when this test starts.
+* `branch` - Branch which should be used to commit files and verify workflows.
+* `fileList` - Array of files that will be commited.
+  * `src` - path to file, related to project main directory.
+  * `dst` - path to destination in repo.
