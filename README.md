@@ -114,21 +114,44 @@ Workflow responsible for updating NPM dependencies. It is run once a week (at 05
 
 ## Testing
 
-To setup tests, create `.env` file with variables:
+### Running tests
 
-* `AUTH_KEY` - GitHub key with permissions to commit files, read and run workflows / actions
-* `OWNER` - Owner of testing repo, e.g. `ckeditor`
-* `REPO` - Testing repo name, e.g. `workflow-tests`
+To run tests, create `.env` file with the following variables:
 
-Run command
+* `AUTH_KEY` - GitHub key with permissions to commit files, read and run workflows / actions.
+* `OWNER` - Owner of tests repo, e.g. `ckeditor`.
+* `REPO` - Tests repo name, e.g. `workflow-tests`.
+
+Then run:
 
 ```
 npm test
 ```
 
-Next tests could be add in `tests/index.js`. Single test structure:
-* `name` - Name which be displayed in console when this test starts.
-* `branch` - Branch which should be used to commit files and verify workflows.
-* `fileList` - Array of files that will be commited.
-  * `src` - path to file, related to project main directory.
-  * `dst` - path to destination in repo.
+### Adding tests
+
+New tests should be added in `tests/index.js` file. Each test has similar structure:
+* `name` - Test name which will be displayed in the console when test starts.
+* `branch` - Branch which should be used to commit files to and verify workflow run.
+* `fileList` - Array of files that will be committed to the specified `branch`.
+  * `src` - Path to a source file, related to project main directory.
+  * `dst` - Path to a destination file in the test repo.
+
+For example:
+
+```js
+{
+	name: 'setup-workflows.yml',
+	branch: 'master',
+	filesList: [
+		{
+			src: 'workflows/setup-workflows.yml',
+			dest: '.github/workflows/setup-workflows.yml'
+		},
+		{
+			src: 'tests/workflows-config.json',
+			dest: '.github/workflows-config.json'
+		}
+	]
+}
+```
