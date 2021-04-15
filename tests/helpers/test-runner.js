@@ -1,13 +1,14 @@
 const chalk = require( 'chalk' );
-const sendFiles = require( './github/files' );
-const { dispatchWorkflow, verifyWorkflowStatus, getRunningWorkflows } = require( './github/workflows' );
 const path = require( 'path' );
 const fs = require( 'fs' );
 
+const sendFiles = require( './github/files' );
+const { dispatchWorkflow, verifyWorkflowStatus, getRunningWorkflows } = require( './github/workflows' );
+
 function collectFixtures() {
-	const tests = [];
 	const fixturesDirectory = path.join( process.cwd(), 'tests/fixtures/' );
 	const fixtures = fs.readdirSync( fixturesDirectory, { withFileTypes: true } );
+	const tests = [];
 
 	for( let fixture of fixtures ) {
 		if ( !fixture.isDirectory() ) {
@@ -21,16 +22,18 @@ function collectFixtures() {
 			continue;
 		}
 
-		const setup = require( modulePath );
-		setup.filesList.forEach( x => x.src = path.join( fixturePath, x.src ) );
+		const fixtureSetup = require( modulePath );
 
-		// Add workflow configuration file to commited files list.
-		setup.filesList.unshift( {
-			src: 'workflows/' + setup.workflow,
-			dest: '.github/workflows/' + setup.workflow
+		// Add project related path to the files path
+		fixtureSetup.filesList.forEach( x => x.src = path.join( fixturePath, x.src ) );
+
+		// Add workflow configuration file files list that will be commited.
+		fixtureSetup.filesList.unshift( {
+			src: 'workflows/' + fixtureSetup.workflow,
+			dest: '.github/workflows/' + fixtureSetup.workflow
 		} );
 
-		tests.push( setup );
+		tests.push( fixtureSetup );
 	}
 
 	return tests;

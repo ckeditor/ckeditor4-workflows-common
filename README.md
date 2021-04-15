@@ -132,8 +132,9 @@ npm test
 
 New tests should be added in `tests/index.js` file. Each test has similar structure:
 * `name` - Test name which will be displayed in the console when test starts.
+* `workflow` - The name of workflow configuration file, ends with the file extension. E.g. 'setup-workflows.yml'. This file will be automatically added to files list.
 * `branch` - Branch which should be used to commit files to and verify workflow run.
-* `fileList` - Array of files that will be committed to the specified `branch`.
+* `filesList` - Array of files that will be committed to the specified `branch`.
   * `src` - Path to a source file, related to project main directory.
   * `dst` - Path to a destination file in the test repo.
 
@@ -141,13 +142,10 @@ For example:
 
 ```js
 {
-	name: 'setup-workflows.yml',
+	name: 'setup-workflows direct PR',
+	workflow: 'setup-workflows.yml',
 	branch: 'master',
 	filesList: [
-		{
-			src: 'workflows/setup-workflows.yml',
-			dest: '.github/workflows/setup-workflows.yml'
-		},
 		{
 			src: 'tests/workflows-config.json',
 			dest: '.github/workflows-config.json'
