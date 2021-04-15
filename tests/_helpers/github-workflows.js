@@ -1,22 +1,18 @@
 const GitHubClient = require( './github-client' );
 
-function verifyWorkflowStatus( workflowObject, reportCurrentStatus, waitingTime ) {
-	return new Promise( ( resolve, reject ) => {
-		if( workflowObject.status === 'completed' ) {
-			resolve( workflowObject );
-			return;
-		}
-		waitingTime = waitingTime || 1000;
+async function verifyWorkflowStatus( workflowObject, reportCurrentStatus, waitingTime ) {
+	if( workflowObject.status === 'completed' ) {
+		return workflowObject;
+	}
+	waitingTime = waitingTime || 1000;
 
-		reportCurrentStatus( workflowObject, waitingTime );
+	reportCurrentStatus( workflowObject, waitingTime );
 
-		setTimeout( async () => {
-			const workflow = await getWorkflowRunResults( workflowObject.id );
-			// Give some time between rechecks
-			const result = await verifyWorkflowStatus( workflow.data, reportCurrentStatus, waitingTime + 3500 );
-			resolve( result );
-		}, waitingTime );
-	} );
+	await timeout( waitingTime );
+	const workflow = await getWorkflowRunResults( workflowObject.id );
+
+	// Give some additional time between rechecks
+	return await verifyWorkflowStatus( workflow.data, reportCurrentStatus, waitingTime + 3500 );
 }
 
 async function getRunningWorkflows() {
@@ -62,6 +58,10 @@ async function dispatchWorkflow( workflowId, branch, input ) {
 	);
 
 	return result;
+}
+
+function timeout( time ) {
+    return new Promise( resolve => setTimeout( resolve, time ) );
 }
 
 module.exports = { dispatchWorkflow, verifyWorkflowStatus, getRunningWorkflows };
