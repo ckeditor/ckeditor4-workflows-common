@@ -1,6 +1,37 @@
 const chalk = require( 'chalk' );
 const sendFiles = require( './github/files' );
 const { dispatchWorkflow, verifyWorkflowStatus, getRunningWorkflows } = require( './github/workflows' );
+const path = require( 'path' );
+const fs = require( 'fs' );
+
+function collectFixtures() {
+	const tests = [];
+	const fixturesDirectory = path.join( process.cwd(), 'tests/fixtures/' );
+	const fixtures = fs.readdirSync( fixturesDirectory, { withFileTypes: true } );
+
+	for( let fixture of fixtures ) {
+		if ( fixture.isDirectory() ) {
+			const fixturePath = path.join( 'tests/fixtures', fixture.name );
+
+			const modulePath = path.join( process.cwd(), fixturePath, 'index' );
+
+			if ( fs.existsSync( modulePath + '.js' ) ) {
+				const setup = require( modulePath );
+				setup.filesList.forEach( x => x.src = path.join( fixturePath, x.src ) );
+				//console.log(setup.filesList);
+				//console.log('***');
+				// Add workflow file to files that will be commited
+				setup.filesList.unshift( {
+					src: 'workflows/' + setup.workflow,
+					dest: '.github/workflows/' + setup.workflow
+				} );
+				tests.push( setup );
+			}
+		}
+	}
+
+	return tests;
+}
 
 async function runTests( tests ) {
 	for(let testCase of tests) {
@@ -45,4 +76,4 @@ function timeout( time ) {
 	return new Promise( resolve => setTimeout( resolve, time ) );
 }
 
-module.exports = { runTests };
+module.exports = { runTests, collectFixtures };
