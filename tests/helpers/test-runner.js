@@ -10,21 +10,27 @@ function collectFixtures() {
 	const fixtures = fs.readdirSync( fixturesDirectory, { withFileTypes: true } );
 
 	for( let fixture of fixtures ) {
-		if ( fixture.isDirectory() ) {
-			const fixturePath = path.join( 'tests/fixtures', fixture.name );
-
-			const modulePath = path.join( process.cwd(), fixturePath, 'index' );
-
-			if ( fs.existsSync( modulePath + '.js' ) ) {
-				const setup = require( modulePath );
-				setup.filesList.forEach( x => x.src = path.join( fixturePath, x.src ) );
-				setup.filesList.unshift( {
-					src: 'workflows/' + setup.workflow,
-					dest: '.github/workflows/' + setup.workflow
-				} );
-				tests.push( setup );
-			}
+		if ( !fixture.isDirectory() ) {
+			continue;
 		}
+
+		const fixturePath = path.join( 'tests/fixtures', fixture.name );
+		const modulePath = path.join( process.cwd(), fixturePath, 'index' );
+
+		if ( fs.existsSync( modulePath + '.js' ) ) {
+			continue;
+		}
+
+		const setup = require( modulePath );
+		setup.filesList.forEach( x => x.src = path.join( fixturePath, x.src ) );
+
+		// Add workflow configuration file to commited files list.
+		setup.filesList.unshift( {
+			src: 'workflows/' + setup.workflow,
+			dest: '.github/workflows/' + setup.workflow
+		} );
+
+		tests.push( setup );
 	}
 
 	return tests;
