@@ -14,9 +14,7 @@ function verifyEnvVariables( requiredVariables ) {
 
 			console.log( chalk.red( `Missing ${ variable } env variable!` ) );
 
-			if ( !anyMissingVariable ) {
-				anyMissingVariable = true;
-			}
+			anyMissingVariable = true;
 		}
 	} );
 

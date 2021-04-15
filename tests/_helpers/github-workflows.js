@@ -49,10 +49,7 @@ async function getWorkflowRun( workflowId ) {
 }
 
 async function dispatchWorkflow( workflowId, branch, input ) {
-	const result = await GitHubClient.request(
-		'POST',
-		'/repos/{owner}/{repo}/actions/workflows/{workflow_id}/dispatches',
-		{
+	const result = await GitHubClient.request( 'POST', '/repos/{owner}/{repo}/actions/workflows/{workflow_id}/dispatches', {
 			headers: {
 				authorization: 'token ' + process.env.AUTH_KEY
 			},
