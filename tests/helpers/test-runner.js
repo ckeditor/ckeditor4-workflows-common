@@ -18,9 +18,6 @@ function collectFixtures() {
 			if ( fs.existsSync( modulePath + '.js' ) ) {
 				const setup = require( modulePath );
 				setup.filesList.forEach( x => x.src = path.join( fixturePath, x.src ) );
-				//console.log(setup.filesList);
-				//console.log('***');
-				// Add workflow file to files that will be commited
 				setup.filesList.unshift( {
 					src: 'workflows/' + setup.workflow,
 					dest: '.github/workflows/' + setup.workflow
@@ -55,7 +52,7 @@ async function runTest( testCase ) {
 		return;
 	}
 
-	await dispatchWorkflow( testCase.name, testCase.branch, testCase.input );
+	await dispatchWorkflow( testCase.workflow, testCase.branch, testCase.input );
 
 	// GH need some time before workflow is actually available as `queued`
 	await timeout( 2000 );
