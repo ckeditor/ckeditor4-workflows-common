@@ -4,12 +4,11 @@ const GitHubClient = {
 	request: async function ( method, url, parameters ) {
 		try {
 			const result = await request( `${ method } ${ url }`, parameters );
+			return result;
 		} catch( e ) {
 			console.log( e );
-			const result = e;
+			return e;
 		}
-
-		return result;
 	}
 };
 
