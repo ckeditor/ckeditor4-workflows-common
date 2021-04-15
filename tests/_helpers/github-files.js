@@ -2,12 +2,19 @@ const fs = require( 'fs' );
 const GitHubClient = require ( './github-client' );
 
 async function sendFiles( branch, files ) {
-	const nextFile = files.shift();
+	const results = [];
 
-	if( nextFile ) {
-		await sendFile( branch, nextFile.src, nextFile.dest );
-		return sendFiles( branch, files );
+	for( let file of files ) {
+		const result = await sendFile( branch, file.src, file.dest );
+
+		results.push( {
+			status: result.status,
+			file: file.src,
+			msg: result.status === 200 ? 'OK' : result.toString()
+		} );
 	}
+
+	return results;
 }
 
 async function sendFile( branch, sourceFilePath, destinationFilePath ) {
@@ -15,8 +22,12 @@ async function sendFile( branch, sourceFilePath, destinationFilePath ) {
 		encoding: 'base64'
 	} );
 
-	const file = await getFile( destinationFilePath, branch );
-	await commitFile( file.data.sha, newContent, destinationFilePath, branch );
+	try{
+		const file = await getFile( destinationFilePath, branch );
+		return await commitFile( file.data.sha, newContent, destinationFilePath, branch );
+	} catch( e ) {
+		return e;
+	}
 }
 
 async function getFile( path, branch ) {

@@ -11,7 +11,7 @@ function verifyWorkflowStatus( workflowObject, reportCurrentStatus, waitingTime 
 		reportCurrentStatus( workflowObject, waitingTime );
 
 		setTimeout( async () => {
-			const workflow = await getWorkflowRun( workflowObject.id );
+			const workflow = await getWorkflowRunResults( workflowObject.id );
 			// Give some time between rechecks
 			const result = await verifyWorkflowStatus( workflow.data, reportCurrentStatus, waitingTime + 3500 );
 			resolve( result );
@@ -19,7 +19,7 @@ function verifyWorkflowStatus( workflowObject, reportCurrentStatus, waitingTime 
 	} );
 }
 
-async function getRunningActions() {
+async function getRunningWorkflows() {
 	const result = await GitHubClient.request( 'GET', '/repos/{owner}/{repo}/actions/runs', {
 		headers: {
 			authorization: 'token ' + process.env.AUTH_KEY
@@ -31,7 +31,7 @@ async function getRunningActions() {
 	return result;
 }
 
-async function getWorkflowRun( workflowId ) {
+async function getWorkflowRunResults( workflowId ) {
 	const result = await GitHubClient.request(
 		'GET',
 		'/repos/{owner}/{repo}/actions/runs/{run_id}',
@@ -64,4 +64,4 @@ async function dispatchWorkflow( workflowId, branch, input ) {
 	return result;
 }
 
-module.exports = { dispatchWorkflow, verifyWorkflowStatus, getRunningActions }
+module.exports = { dispatchWorkflow, verifyWorkflowStatus, getRunningWorkflows };

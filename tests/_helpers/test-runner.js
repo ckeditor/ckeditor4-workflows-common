@@ -1,28 +1,36 @@
 const chalk = require( 'chalk' );
 const sendFiles = require( './github-files' );
-const { dispatchWorkflow, verifyWorkflowStatus, getRunningActions } = require( './github-workflows' );
+const { dispatchWorkflow, verifyWorkflowStatus, getRunningWorkflows } = require( './github-workflows' );
 
 async function runTests( tests ) {
-	const testCase = tests.shift();
-
-	if( testCase ) {
+	for(let testCase of tests) {
 		console.log( '\n *** Running test for: ' + chalk.blue( testCase.name ) + ' ***' );
-		await runTest( testCase );
-		return runTests( tests );
+		await runTest(testCase);
 	}
 }
 
 async function runTest( testCase ) {
 	return new Promise( async ( resolve, reject ) => {
-		await sendFiles( testCase.branch, testCase.filesList );
+		console.log( `Pushing files to ${ chalk.blue( process.env.REPO ) } repo on ${ chalk.blue( testCase.branch ) } branch` );
 
-		console.log( 'All files pushed to repo at ' + chalk.blue( testCase.branch ) + ' branch' );
+		const results = await sendFiles( testCase.branch, testCase.filesList );
+
+		for( let result of results ) {
+			console.log( `File ${ chalk.blue( result.file ) } ( ${ chalk.green( result.status ) }: ${ result.msg } )` );
+		}
+
+		const foundErrors = results.filter( result => result.status !== 200 );
+		if( foundErrors.length > 0 ) {
+			console.log( chalk.red( 'Skip test due to errors!' ) );
+			resolve();
+			return;
+		}
 
 		await dispatchWorkflow( testCase.name, testCase.branch, testCase.input );
 
 		// GH need some time before workflow is actually available as `queued`
 		setTimeout( async () => {
-			const actions = await getRunningActions();
+			const actions = await getRunningWorkflows();
 
 			// First action is the latest one - recently dispatched
 			const workflow = actions.data.workflow_runs[ 0 ];
