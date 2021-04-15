@@ -1,5 +1,5 @@
 {
-    "updateDeps": {
-        "targetBranch": "master"
-    }
+	"updateDeps": {
+		"targetBranch": "master"
+	}
 }

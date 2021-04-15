@@ -1,5 +1,5 @@
 {
-    "setupWorkflows": {
-        "pushAsPullRequest": false
-    }
+	"setupWorkflows": {
+		"pushAsPullRequest": false
+	}
 }

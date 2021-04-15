@@ -4,7 +4,7 @@ const GitHubClient = require ( './client' );
 async function sendFiles( branch, files ) {
 	const results = [];
 
-	for( let file of files ) {
+	for ( let file of files ) {
 		const result = await sendFile( branch, file.src, file.dest );
 
 		results.push( {

@@ -22,20 +22,17 @@ async function getRunningWorkflows() {
 		},
 		owner: process.env.OWNER ,
 		repo: process.env.REPO
-	  });
+	} );
 
 	return result;
 }
 
 async function getWorkflowRunResults( workflowId ) {
-	const result = await GitHubClient.request(
-		'GET',
-		'/repos/{owner}/{repo}/actions/runs/{run_id}',
-		{
+	const result = await GitHubClient.request( 'GET', '/repos/{owner}/{repo}/actions/runs/{run_id}', {
 			headers: {
 				authorization: 'token ' + process.env.AUTH_KEY
 			},
-			owner: process.env.OWNER ,
+			owner: process.env.OWNER,
 			repo: process.env.REPO,
 			run_id: workflowId
 		}
@@ -61,7 +58,7 @@ async function dispatchWorkflow( workflowId, branch, input ) {
 }
 
 function timeout( time ) {
-    return new Promise( resolve => setTimeout( resolve, time ) );
+	return new Promise( resolve => setTimeout( resolve, time ) );
 }
 
 module.exports = { dispatchWorkflow, verifyWorkflowStatus, getRunningWorkflows };

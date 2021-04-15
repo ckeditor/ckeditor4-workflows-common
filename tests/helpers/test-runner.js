@@ -10,7 +10,7 @@ function collectFixtures() {
 	const fixtures = fs.readdirSync( fixturesDirectory, { withFileTypes: true } );
 	const tests = [];
 
-	for( let fixture of fixtures ) {
+	for ( let fixture of fixtures ) {
 		if ( !fixture.isDirectory() ) {
 			continue;
 		}
@@ -40,9 +40,9 @@ function collectFixtures() {
 }
 
 async function runTests( tests ) {
-	for(let testCase of tests) {
+	for ( let testCase of tests ) {
 		console.log( '\n *** Running test for: ' + chalk.blue( testCase.name ) + ' ***' );
-		await runTest(testCase);
+		await runTest( testCase );
 	}
 }
 
@@ -56,7 +56,7 @@ async function runTest( testCase ) {
 	}
 
 	const foundErrors = results.filter( result => result.status !== 200 );
-	if( foundErrors.length > 0 ) {
+	if ( foundErrors.length > 0 ) {
 		console.log( chalk.red( 'Skip test due to errors!' ) );
 		return;
 	}

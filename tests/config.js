@@ -18,7 +18,7 @@ function verifyEnvVariables( requiredVariables ) {
 		}
 	} );
 
-	if( anyMissingVariable ) {
+	if ( anyMissingVariable ) {
 		process.exit( -1 );
 	}
 }
