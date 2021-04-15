@@ -1,4 +1,4 @@
-const GitHubClient = require( './github-client' );
+const GitHubClient = require( './client' );
 
 async function verifyWorkflowStatus( workflowObject, reportCurrentStatus, waitingTime ) {
 	if( workflowObject.status === 'completed' ) {

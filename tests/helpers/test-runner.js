@@ -1,6 +1,6 @@
 const chalk = require( 'chalk' );
-const sendFiles = require( './github-files' );
-const { dispatchWorkflow, verifyWorkflowStatus, getRunningWorkflows } = require( './github-workflows' );
+const sendFiles = require( './github/files' );
+const { dispatchWorkflow, verifyWorkflowStatus, getRunningWorkflows } = require( './github/workflows' );
 
 async function runTests( tests ) {
 	for(let testCase of tests) {

@@ -1,7 +1,7 @@
 'use strict';
 
 require( './config' )();
-const { runTests } = require( './_helpers/test-runner' );
+const { runTests } = require( './helpers/test-runner' );
 
 const tests = [
 	{
@@ -13,7 +13,7 @@ const tests = [
 				dest: '.github/workflows/setup-workflows.yml'
 			},
 			{
-				src: 'tests/workflows-config.json',
+				src: 'tests/fixtures/workflows-config.json',
 				dest: '.github/workflows-config.json'
 			},
 		]

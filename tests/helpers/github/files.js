@@ -1,5 +1,5 @@
 const fs = require( 'fs' );
-const GitHubClient = require ( './github-client' );
+const GitHubClient = require ( './client' );
 
 async function sendFiles( branch, files ) {
 	const results = [];
