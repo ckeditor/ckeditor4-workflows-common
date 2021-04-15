@@ -18,13 +18,13 @@ function collectFixtures() {
 		const fixturePath = path.join( 'tests/fixtures', fixture.name );
 		const modulePath = path.join( process.cwd(), fixturePath, 'index' );
 
-		if ( fs.existsSync( modulePath + '.js' ) ) {
+		if ( !fs.existsSync( modulePath + '.js' ) ) {
 			continue;
 		}
 
 		const fixtureSetup = require( modulePath );
 
-		// Add project related path to the files path
+		// Add project related path to the files path.
 		fixtureSetup.filesList.forEach( x => x.src = path.join( fixturePath, x.src ) );
 
 		// Add workflow configuration file files list that will be commited.
