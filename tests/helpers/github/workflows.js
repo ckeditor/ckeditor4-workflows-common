@@ -50,7 +50,7 @@ async function dispatchWorkflow( workflowId, branch, input ) {
 			repo: process.env.REPO,
 			workflow_id: workflowId,
 			ref: branch,
-			inputs: input
+			inputs: { 'config': JSON.stringify( input ) }
 		}
 	);
 
