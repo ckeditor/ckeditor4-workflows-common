@@ -9,34 +9,24 @@ function collectFixtures() {
 	const fixturesDirectory = path.join( process.cwd(), 'tests/fixtures/' );
 	const fixtures = fs.readdirSync( fixturesDirectory, { withFileTypes: true } );
 	const tests = [];
+	let fixtureSetups = fixtures
+		.filter( fixtureFile => fixtureFile.isFile() )
+		.flatMap( fixtureFile => {
+			return require( path.join( fixturesDirectory, fixtureFile.name ) );
+		} );
 
-	for ( let fixture of fixtures ) {
-		if ( !fixture.isDirectory() ) {
-			continue;
-		}
-
-		const fixturePath = path.join( 'tests/fixtures', fixture.name );
-		const modulePath = path.join( process.cwd(), fixturePath, 'index' );
-
-		if ( !fs.existsSync( modulePath + '.js' ) ) {
-			continue;
-		}
-
-		const fixtureSetup = require( modulePath );
-
+	fixtureSetups.forEach( fixtureSetup => {
 		// Add project related path to the files path.
-		fixtureSetup.filesList.forEach( x => x.src = path.join( fixturePath, x.src ) );
+		fixtureSetup.filesList.forEach( x => x.src = path.join( 'tests/fixtures', x.src ) );
 
-		// Add workflow configuration file files list that will be commited.
+		// Add workflow configuration file to files list that will be commited.
 		fixtureSetup.filesList.unshift( {
 			src: 'workflows/' + fixtureSetup.workflow,
 			dest: '.github/workflows/' + fixtureSetup.workflow
 		} );
+	} );
 
-		tests.push( fixtureSetup );
-	}
-
-	return tests;
+	return fixtureSetups;
 }
 
 async function runTests( tests ) {
@@ -61,7 +51,7 @@ async function runTest( testCase ) {
 		return;
 	}
 
-	await dispatchWorkflow( testCase.workflow, testCase.branch, testCase.input );
+	await dispatchWorkflow( testCase.workflow, testCase.branch, testCase.config );
 
 	// GH need some time before workflow is actually available as `queued`
 	await timeout( 2000 );
