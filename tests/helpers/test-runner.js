@@ -17,7 +17,7 @@ function collectFixtures() {
 
 	fixtureSetups.forEach( fixtureSetup => {
 		// Add project related path to the files path.
-		fixtureSetup.filesList.forEach( x => x.src = path.join( 'tests/fixtures', x.src ) );
+		fixtureSetup.filesList.forEach( x => x.src = path.join( 'tests/assets', x.src ) );
 
 		// Add workflow configuration file to files list that will be commited.
 		fixtureSetup.filesList.unshift( {
