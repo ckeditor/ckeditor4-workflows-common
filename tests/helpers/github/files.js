@@ -22,7 +22,7 @@ async function sendFile( branch, sourceFilePath, destinationFilePath ) {
 		encoding: 'base64'
 	} );
 
-	try{
+	try {
 		const file = await getFile( destinationFilePath, branch );
 		return await commitFile( file.data.sha, newContent, destinationFilePath, branch );
 	} catch( e ) {
