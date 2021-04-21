@@ -24,7 +24,11 @@ async function sendFile( branch, sourceFilePath, destinationFilePath ) {
 
 	try {
 		const file = await getFile( destinationFilePath, branch );
-		return await commitFile( file.data.sha, newContent, destinationFilePath, branch );
+
+		const sha = file.status === 404 ? undefined : file.data.sha;
+		const commitResult = await commitFile( sha, newContent, destinationFilePath, branch );
+
+		return commitResult;
 	} catch( e ) {
 		return e;
 	}

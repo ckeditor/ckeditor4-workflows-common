@@ -45,7 +45,7 @@ async function runTest( testCase ) {
 		console.log( `\tFile ${ chalk.blue( result.file ) } ( ${ chalk.green( result.status ) }: ${ result.msg } )` );
 	}
 
-	const foundErrors = results.filter( result => result.status !== 200 );
+	const foundErrors = results.filter( result => ![ 200, 201 ].includes( result.status ) );
 	if ( foundErrors.length > 0 ) {
 		console.log( chalk.red( 'Skip test due to errors!' ) );
 		return;
