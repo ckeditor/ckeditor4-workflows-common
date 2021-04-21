@@ -130,12 +130,19 @@ npm test
 
 ### Adding tests
 
-New tests should be added in `tests/index.js` file. Each test has similar structure:
+New test case configuration should be added in the existing fixture file in `tests/fixtures` directory.
+
+New fixture should be added in `tests/fixtures` directory. New fixtures should be added as a new file with name matched to the actuall workflow. There should be exported array of fixture setups.
+
+Put all additional files in `tests/assets` directory.
+
+Each setup has similar structure:
 * `name` - Test name which will be displayed in the console when test starts.
 * `workflow` - The name of workflow configuration file, ends with the file extension. E.g. 'setup-workflows.yml'. This file will be automatically added to files list.
 * `branch` - Branch which should be used to commit files to and verify workflow run.
+* `config` - Object with a configuration that will be passed to workflow during dispatching.
 * `filesList` - Array of files that will be committed to the specified `branch`.
-  * `src` - Path to a source file, related to project main directory.
+  * `src` - Path to a source file, related to `assets` directory.
   * `dst` - Path to a destination file in the test repo.
 
 For example:
@@ -145,10 +152,15 @@ For example:
 	name: 'setup-workflows direct PR',
 	workflow: 'setup-workflows.yml',
 	branch: 'master',
+	config: {
+		'updateDeps': {
+			'targetBranch': 'master'
+		}
+	},
 	filesList: [
 		{
-			src: 'tests/workflows-config.json',
-			dest: '.github/workflows-config.json'
+			src: 'deps-package.json',
+			dest: 'package.json'
 		}
 	]
 }
