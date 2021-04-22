@@ -16,11 +16,13 @@ function collectFixtures() {
 		} );
 
 	fixtureSetups.forEach( fixtureSetup => {
+		fixtureSetup.fileList = fixtureSetup.fileList || [];
+
 		// Add project related path to the files path.
-		fixtureSetup.filesList.forEach( x => x.src = path.join( 'tests/assets', x.src ) );
+		fixtureSetup.fileList.forEach( x => x.src = path.join( 'tests/assets', x.src ) );
 
 		// Add workflow configuration file to files list that will be commited.
-		fixtureSetup.filesList.unshift( {
+		fixtureSetup.fileList.unshift( {
 			src: 'workflows/' + fixtureSetup.workflow,
 			dest: '.github/workflows/' + fixtureSetup.workflow
 		} );
@@ -39,7 +41,7 @@ async function runTests( tests ) {
 async function runTest( testCase ) {
 	console.log( `Pushing files to ${ chalk.blue( process.env.REPO ) } repo on ${ chalk.blue( testCase.branch ) } branch` );
 
-	const results = await sendFiles( testCase.branch, testCase.filesList );
+	const results = await sendFiles( testCase.branch, testCase.fileList );
 
 	for( let result of results ) {
 		console.log( `\tFile ${ chalk.blue( result.file ) } ( ${ chalk.green( result.status ) }: ${ result.msg } )` );

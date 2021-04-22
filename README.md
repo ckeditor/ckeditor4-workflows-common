@@ -141,7 +141,7 @@ Each setup has similar structure:
 * `workflow` - The name of workflow configuration file, ends with the file extension. E.g. 'setup-workflows.yml'. This file will be automatically added to files list.
 * `branch` - Branch which should be used to commit files to and verify workflow run.
 * `config` - Object with a configuration that will be passed to workflow during dispatching.
-* `filesList` - Array of files that will be committed to the specified `branch`.
+* `fileList` - Array of files that will be committed to the specified `branch`.
   * `src` - Path to a source file, related to `assets` directory.
   * `dst` - Path to a destination file in the test repo.
 
@@ -157,7 +157,7 @@ For example:
 			'targetBranch': 'master'
 		}
 	},
-	filesList: [
+	fileList: [
 		{
 			src: 'deps-package.json',
 			dest: 'package.json'

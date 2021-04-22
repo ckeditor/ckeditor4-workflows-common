@@ -7,7 +7,7 @@ module.exports = [ {
 			'targetBranch': 'master'
 		}
 	},
-	filesList: [ {
+	fileList: [ {
 		src: 'deps-package.json',
 		dest: 'package.json'
 	} ]
