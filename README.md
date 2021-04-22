@@ -130,11 +130,11 @@ npm test
 
 ### Adding tests
 
-New test case configuration should be added in the existing fixture file in `tests/fixtures` directory.
+Tests case for new workflows should be added in `tests/fixtures` directory - for example `new-workflow.yml` should by covered with tests from `tests/fixtures/new-workflow.js`. The test file should export array of tests cases (see example below).
 
-New fixture should be added in `tests/fixtures` directory. New fixtures should be added as a new file with name matched to the actuall workflow. There should be exported array of fixture setups.
+New test cases for existing workflows should be added in their test file  in `tests/fixtures` directory with the same name.
 
-Put all additional files in `tests/assets` directory.
+All additional files required for tests should be added in `tests/assets` directory.
 
 Each setup has similar structure:
 * `name` - Test name which will be displayed in the console when test starts.
