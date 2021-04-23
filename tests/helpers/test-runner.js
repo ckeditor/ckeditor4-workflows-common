@@ -36,6 +36,10 @@ async function runTests( tests ) {
 		console.log( '\n *** Running test for: ' + chalk.blue( testCase.name ) + ' ***' );
 		await runTest( testCase );
 	}
+
+	console.log( '--- --- ---' );
+	console.log( '--- --- ---' );
+	console.log( `Testing finished! Your testing repo: https://github.com/${ process.env.OWNER }/${ process.env.REPO }` );
 }
 
 async function runTest( testCase ) {
@@ -68,6 +72,7 @@ async function runTest( testCase ) {
 	} );
 
 	console.log( chalk.green( result.name + 'run is finished!' ) + ' Result: ' + chalk.yellow( result.conclusion ) );
+	console.log( `Details: https://github.com/${ process.env.OWNER }/${ process.env.REPO }/actions/runs/${ workflow.id }` );
 }
 
 function timeout( time ) {
