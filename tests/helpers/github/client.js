@@ -6,7 +6,6 @@ const GitHubClient = {
 			const result = await request( `${ method } ${ url }`, parameters );
 			return result;
 		} catch( e ) {
-			console.log( e );
 			return e;
 		}
 	}
