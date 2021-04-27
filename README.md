@@ -111,3 +111,57 @@ Workflow responsible for updating NPM dependencies. It is run once a week (at 05
 #### Optional configuration
 
 * `updateDeps.targetBranch` : `String` Target branch name. By default, workflow runs on main repository branch.
+
+## Testing
+
+### Running tests
+
+To run tests, create `.env` file with the following variables:
+
+* `AUTH_KEY` - GitHub key with permissions to commit files, read and run workflows / actions.
+* `OWNER` - Owner of tests repo, e.g. `ckeditor`.
+* `REPO` - Tests repo name, e.g. `workflow-tests`. It should be an empty repository with `master` branch and `README.md` file only.
+
+Then run:
+
+```
+npm test
+```
+
+### Adding tests
+
+Tests case for new workflows should be added in `tests/fixtures` directory - for example `new-workflow.yml` should by covered with tests from `tests/fixtures/new-workflow.js`. The test file should export array of tests cases (see example below).
+
+New test cases for existing workflows should be added in their test file  in `tests/fixtures` directory with the same name.
+
+All additional files required for tests should be added in `tests/assets` directory.
+
+Each setup has similar structure:
+* `name` - Test name which will be displayed in the console when test starts.
+* `workflow` - The name of workflow configuration file, ends with the file extension. E.g. 'setup-workflows.yml'. This file will be automatically added to files list.
+* `branch` - Branch which should be used to commit files to and verify workflow run.
+* `config` - Object with a configuration that will be passed to workflow during dispatching.
+* `fileList` - Array of files that will be committed to the specified `branch`.
+  * `src` - Path to a source file, related to `assets` directory.
+  * `dst` - Path to a destination file in the test repo.
+
+For example:
+
+```js
+{
+	name: 'setup-workflows direct PR',
+	workflow: 'setup-workflows.yml',
+	branch: 'master',
+	config: {
+		'updateDeps': {
+			'targetBranch': 'master'
+		}
+	},
+	fileList: [
+		{
+			src: 'deps-package.json',
+			dest: 'package.json'
+		}
+	]
+}
+```
