@@ -120,7 +120,7 @@ To run tests, create `.env` file with the following variables:
 
 * `AUTH_KEY` - GitHub key with permissions to commit files, read and run workflows / actions.
 * `OWNER` - Owner of tests repo, e.g. `ckeditor`.
-* `REPO` - Tests repo name, e.g. `workflow-tests`.
+* `REPO` - Tests repo name, e.g. `workflow-tests`. It should be an empty repository with `master` branch and `README.md` file only.
 
 Then run:
 
