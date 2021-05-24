@@ -101,7 +101,7 @@ Since this workflow uses labels to mark stale issues/PRs, labels should be alrea
 
 ### update-deps
 
-Workflow responsible for updating NPM dependencies. It is run once a week (at 05:00 UTC on Monday) and creates two PRs (if there are any outdated dependencies) - one for dev dependencies and one for production ones. It checks `package.json` file in the repository root and uses `npm-check` to update all dev/prod dependencies (which means `package.json` versioning is not respected). It is a cron job task so will be triggered only on main repository branch. See `workflows/update-deps.yml` file.
+Workflow responsible for updating NPM dependencies. It is run on 1st and 15th day of each month (at 05:00 UTC) and creates two PRs - one for dev dependencies and one for production ones (if there are any outdated dependencies). It checks `package.json` file in the repository root and uses `npm-check` to update all dev/prod dependencies (which means `package.json` versioning is not respected). It is a cron job task so will be triggered only on main repository branch. See `workflows/update-deps.yml` file.
 
 #### Required secrets
 
@@ -130,9 +130,9 @@ npm test
 
 ### Adding tests
 
-Tests case for new workflows should be added in `tests/fixtures` directory - for example `new-workflow.yml` should by covered with tests from `tests/fixtures/new-workflow.js`. The test file should export array of tests cases (see example below).
+Tests case for new workflows should be added in `tests/fixtures` directory - for example `new-workflow.yml` should be covered with tests from `tests/fixtures/new-workflow.js`. The test file should export array of tests cases (see example below).
 
-New test cases for existing workflows should be added in their test file  in `tests/fixtures` directory with the same name.
+New test cases for existing workflows should be added in their test file in `tests/fixtures` directory with the same name.
 
 All additional files required for tests should be added in `tests/assets` directory.
 
