@@ -4,18 +4,14 @@ module.exports = [
 		workflow: 'update-deps.yml',
 		branch: 'master',
 		config: {
-			'updateDeps': {
-				'targetBranch': 'master'
-			}
+			'targetBranch': 'master'
 		}
 	}, {
 		name: 'update-deps on up-to-date branch',
 		workflow: 'update-deps.yml',
 		branch: 'master',
 		config: {
-			'updateDeps': {
-				'targetBranch': 'master'
-			}
+			'targetBranch': 'master'
 		},
 		fileList: [ {
 			src: 'deps-package-up-to-date.json',
@@ -26,9 +22,7 @@ module.exports = [
 		workflow: 'update-deps.yml',
 		branch: 'master',
 		config: {
-			'updateDeps': {
-				'targetBranch': 'master'
-			}
+			'targetBranch': 'master'
 		},
 		fileList: [ {
 			src: 'deps-package-outdated.json',
@@ -39,9 +33,7 @@ module.exports = [
 		workflow: 'update-deps.yml',
 		branch: 'master',
 		config: {
-			'updateDeps': {
-				'targetBranch': 'main'
-			}
+			'targetBranch': 'main'
 		},
 		fileList: [ {
 			src: 'deps-package-outdated.json',

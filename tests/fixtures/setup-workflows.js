@@ -3,9 +3,7 @@ module.exports = [ {
 		workflow: 'setup-workflows.yml',
 		branch: 'master',
 		config: {
-			'setupWorkflows': {
-				'pushAsPullRequest': 'false'
-			}
+			'pushAsPullRequest': 'false'
 		}
 	}, {
 		name: 'setup-workflows direct push (no config)',
@@ -16,9 +14,7 @@ module.exports = [ {
 		workflow: 'setup-workflows.yml',
 		branch: 'master',
 		config: {
-			'setupWorkflows': {
-				'pushAsPullRequest': 'true'
-			}
+			'pushAsPullRequest': 'true'
 		}
 	}
 ];
