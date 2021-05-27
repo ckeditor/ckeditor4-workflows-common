@@ -71,7 +71,7 @@ async function runTest( testCase ) {
 		console.log( `Status: ${ chalk.yellow( workflowObject.status ) }. Result: ${ chalk.yellow( workflowObject.conclusion ) }. Next check in ${ waitingTime }ms` );
 	} );
 
-	console.log( chalk.green( result.name + 'run is finished!' ) + ' Result: ' + chalk.yellow( result.conclusion ) );
+	console.log( chalk.green( '"' + result.name + '" run is finished!' ) + ' Result: ' + chalk.yellow( result.conclusion ) );
 	console.log( `Details: https://github.com/${ process.env.OWNER }/${ process.env.REPO }/actions/runs/${ workflow.id }` );
 }
 
