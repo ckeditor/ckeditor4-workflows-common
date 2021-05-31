@@ -1,3 +1,7 @@
+let date = new Date();
+let testNpmCheck = true;
+let npmCheckDate = testNpmCheck ? date.getDate() : date.getDate() + 1;
+
 module.exports = [
 	{
 		name: 'update-deps branch without package.json file',
@@ -23,6 +27,17 @@ module.exports = [
 		branch: 'master',
 		config: {
 			'targetBranch': 'master'
+		},
+		fileList: [ {
+			src: 'deps-package-outdated.json',
+			dest: 'package.json'
+		} ]
+	}, {
+		name: 'update-deps with npm-check on custom day of month',
+		workflow: 'update-deps.yml',
+		branch: 'master',
+		config: {
+			'npmCheckDate': npmCheckDate
 		},
 		fileList: [ {
 			src: 'deps-package-outdated.json',

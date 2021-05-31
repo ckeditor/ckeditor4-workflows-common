@@ -59,9 +59,18 @@ jobs:
           fi
           echo "BRANCH_TARGET=$BRANCH_TARGET" >> $GITHUB_ENV
 
+          DAY=$(date +"%d")
+          NPM_CHECK_DATE=$(echo '${{ env.CONFIG }}' | jq -r ".npmCheckDate")
+
+          if [[ "$DAY" == "$NPM_CHECK_DATE" ]]; then
+            echo "DEPS_BUMP_METHOD=npm-check" >> $GITHUB_ENV
+          else
+            echo "DEPS_BUMP_METHOD=npm_update" >> $GITHUB_ENV
+          fi
+
       - name: Check if update branch already exists
         run: |
-          echo "BRANCH_UPDATE=deps-update_${{ env.BRANCH_TARGET }}_${{ matrix.deps }}" >> $GITHUB_ENV
+          echo "BRANCH_UPDATE=deps-${{ env.DEPS_BUMP_METHOD}}_${{ env.BRANCH_TARGET }}_${{ matrix.deps }}" >> $GITHUB_ENV
           if [[ $(git ls-remote --heads | grep deps-update_${{ env.BRANCH_TARGET }}_${{ matrix.deps }} | wc -c) -ne 0 ]]; then
             echo "BRANCH_UPDATE=0" >> $GITHUB_ENV
           fi
@@ -73,10 +82,18 @@ jobs:
             echo "'package.json' file not found, with nothing to update the workflow ends here."
             exit 0
           fi
-          npm i
-          npm install -g npm-check
-          git checkout -b ${{ env.BRANCH_UPDATE }}
-          npm-check -y --${{ matrix.deps }}
+
+          if [[ "${{ env.DEPS_BUMP_METHOD }}" == "npm_update" ]]; then
+            echo "Just npm update today!"
+            git checkout -b ${{ env.BRANCH_UPDATE }}
+            npm update
+          else
+            echo "Running npm-check!"
+            npm i
+            npm install -g npm-check
+            git checkout -b ${{ env.BRANCH_UPDATE }}
+            npm-check -y --${{ matrix.deps }}
+          fi
 
       - name: Add changes
         if: env.BRANCH_UPDATE != 0
