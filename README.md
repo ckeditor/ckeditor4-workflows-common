@@ -116,17 +116,30 @@ Workflow responsible for updating NPM dependencies. It is run on 1st and 15th da
 
 ### Running tests
 
-To run tests, create `.env` file with the following variables:
+To run tests, in the `ckeditor4-workflows-common` repo create an `.env` file with the following variables:
 
-* `AUTH_KEY` - GitHub key with permissions to commit files, read and run workflows / actions.
+* `AUTH_KEY` - GitHub key with permissions to commit files, read and run workflows / actions. To get a token follow [Creating a personal access token](https://docs.github.com/en/github/authenticating-to-github/keeping-your-account-and-data-secure/creating-a-personal-access-token) tutorial.
 * `OWNER` - Owner of tests repo, e.g. `ckeditor`.
-* `REPO` - Tests repo name, e.g. `workflow-tests`. It should be an empty repository with `master` branch and `README.md` file only.
+* `REPO` - Tests repo name, e.g. `workflow-tests`. It should be an empty repository with `master` branch and `README.md` file only. Remember it also requires setting your GH Secrets on repo level (the ones inherited from organization level probably won't work). For now to run all workflows you need 3 secrets:
+  * `GH_WORKFLOWS_TOKEN` (same as `AUTH_KEY` variable);
+  * `GH_BOT_EMAIL` (most likely you );
+  * `GH_BOT_USERNAME`.
 
-Then run:
+So the file should look like this:
+
+```
+AUTH_KEY="ghp_heregoesquitealonghash"
+OWNER="ckeditor"
+REPO="workflow-tests-PR-100"
+```
+
+Then (still being in `ckeditor4-workflows-common` repo) run:
 
 ```
 npm test
 ```
+
+Remember to use appropriate Node.js version (v14). After tests are finished, you need to manually check in testing repo if everything was done as it should be (tests only check if workflows were executed).
 
 ### Adding tests
 
