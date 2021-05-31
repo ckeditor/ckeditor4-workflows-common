@@ -1,6 +1,6 @@
 let date = new Date();
 let testNpmCheck = true;
-let npmCheckDate = testNpmCheck ? date.getDate() : date.getDate() + 1;
+let npmCheckDay = testNpmCheck ? date.getDate() : date.getDate() + 1;
 
 module.exports = [
 	{
@@ -37,7 +37,7 @@ module.exports = [
 		workflow: 'update-deps.yml',
 		branch: 'master',
 		config: {
-			'npmCheckDate': npmCheckDate
+			'npmCheckDay': npmCheckDay
 		},
 		fileList: [ {
 			src: 'deps-package-outdated.json',
