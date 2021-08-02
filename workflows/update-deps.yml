@@ -59,10 +59,8 @@ jobs:
           fi
           echo "BRANCH_TARGET=$BRANCH_TARGET" >> $GITHUB_ENV
 
-          DAY=$(date +"%d")
-          NPM_CHECK_DAY=$(echo '${{ env.CONFIG }}' | jq -r ".npmCheckDay")
-
-          if [[ "$DAY" == "$NPM_CHECK_DAY" ]]; then
+          SHOULD_BUMP=$(echo '${{ env.CONFIG }}' | jq -r ".bump")
+          if [[ "$SHOULD_BUMP" == "true" ]]; then
             echo "DEPS_BUMP_METHOD=npm-check" >> $GITHUB_ENV
           else
             echo "DEPS_BUMP_METHOD=npm_update" >> $GITHUB_ENV
