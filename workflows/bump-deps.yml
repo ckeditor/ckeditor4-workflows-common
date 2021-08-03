@@ -1,0 +1,40 @@
+name: Bump dependencies
+on:
+  schedule:
+    - cron: "0 0 1 * *"
+  workflow_dispatch:
+    inputs:
+      config:
+        description: 'Config'
+        required: false
+        default: ''
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Read config
+        run: |
+          CONFIG='{}'
+          if [[ ! -z '${{ github.event.inputs.config }}' ]]; then
+            CONFIG='${{ github.event.inputs.config }}'
+          elif [[ -f "./.github/workflows-config.json" ]]; then
+            CONFIG=$( jq -c .updateDeps './.github/workflows-config.json' )
+          fi
+          echo "Workflow config: $CONFIG"
+          echo "CONFIG=$CONFIG" >> $GITHUB_ENV
+      - name: Merge configs
+        run: |
+          CONFIG=$(echo '${{ env.CONFIG }}' | jq -c '. += {"bump": "true"}')
+          # echo "${CONFIG}"
+          INPUT_1='{ "config": "'
+          INPUT_2=$(echo "${CONFIG//\"/\\\"}")
+          INPUT_3='"}'
+          INPUT_ALL="${INPUT_1} ${INPUT_2} ${INPUT_3}"
+          echo "INPUT_ALL=$INPUT_ALL" >> $GITHUB_ENV
+      - name: Invoke workflow with inputs
+        uses: benc-uk/workflow-dispatch@v1
+        with:
+          workflow: Update NPM dependencies
+          token: ${{ secrets.GH_WORKFLOWS_TOKEN }}
+          inputs: ${{ env.INPUT_ALL }}
