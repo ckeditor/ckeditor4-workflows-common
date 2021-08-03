@@ -20,5 +20,18 @@ module.exports = [
 			src: 'deps-package-outdated.json',
 			dest: 'package.json'
 		} ]
+	},
+	{
+		name: 'update-deps with bump on false in cfg',
+		workflow: 'bump-deps.yml',
+		branch: 'master',
+		config: {
+			targetBranch: 'master',
+			bump: 'false'
+		},
+		fileList: [ {
+			src: 'deps-package-outdated.json',
+			dest: 'package.json'
+		} ]
 	}
 ];
