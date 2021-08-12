@@ -19,6 +19,7 @@ jobs:
         stale-pr-label: 'stale'
         exempt-issue-labels: 'status:confirmed,status:blocked'
         exempt-pr-labels: 'status:blocked'
+        exempt-assignees: 'Comandeer,sculpt0r,jacekbogdanski,Dumluregn,MMMalik'
         close-issue-label: 'resolution:expired'
         close-pr-label: 'pr:frozen ❄'
         remove-stale-when-updated: true
