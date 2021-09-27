@@ -99,9 +99,13 @@ Since this workflow uses labels to mark stale issues/PRs, labels should be alrea
 * `resolution:expired` - label added to stale issues which got closed due to inactivity.
 * `pr:frozen ❄` - label added to stale PRs which got closed due to inactivity.
 
-### update-deps
+### update-deps-semversion
 
-Workflow responsible for updating NPM dependencies. It is run on 1st and 15th day of each month (at 05:00 UTC) and creates two PRs - one for dev dependencies and one for production ones (if there are any outdated dependencies). It checks `package.json` file in the repository root and uses `npm-check` to update all dev/prod dependencies (which means `package.json` versioning is not respected). It is a cron job task so will be triggered only on main repository branch. See `workflows/update-deps-semversion.yml` file.
+Workflow responsible for updating NPM dependencies. It is run on 1st and 15th day of each month (at 05:00 UTC) and creates two PRs - one for dev dependencies and one for production ones (if there are any outdated dependencies). It checks `package.json` file in the repository root. Depends on provided config, it will use `npm-check` (`semversion` compatibility mode) or `npm_update` (bump version to newest available) to update all dev/prod dependencies. It is a cron job task so will be triggered only on main repository branch. See `workflows/update-deps-semversion.yml` file.
+
+### update-deps-to-newest
+
+Workflow responsible for running `update-deps-semversion` workflow, but with config that disables semversion compatibility. It is scheduled to run once a month. See `workflows/update-deps-to-newest.yml` file.
 
 #### Required secrets
 
