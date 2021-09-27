@@ -1,4 +1,4 @@
-name: Update NPM dependencies
+name: Update NPM dependencies(semversion)
 
 on:
   schedule:

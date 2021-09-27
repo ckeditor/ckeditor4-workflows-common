@@ -1,4 +1,4 @@
-name: Bump dependencies
+name: Update NPM dependencies(to newest)
 on:
   schedule:
     - cron: "0 0 1 * *"
@@ -35,6 +35,6 @@ jobs:
       - name: Invoke workflow with inputs
         uses: benc-uk/workflow-dispatch@v1
         with:
-          workflow: Update NPM dependencies
+          workflow: Update NPM dependencies(semversion)
           token: ${{ secrets.GH_WORKFLOWS_TOKEN }}
           inputs: ${{ env.INPUT_ALL }}

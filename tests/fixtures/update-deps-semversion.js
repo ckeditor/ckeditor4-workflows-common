@@ -5,14 +5,14 @@ let npmCheckDay = testNpmCheck ? date.getDate() : date.getDate() + 1;
 module.exports = [
 	{
 		name: 'update-deps branch without package.json file',
-		workflow: 'update-deps.yml',
+		workflow: 'update-deps-semversion.yml',
 		branch: 'master',
 		config: {
 			'targetBranch': 'master'
 		}
 	}, {
 		name: 'update-deps on up-to-date branch',
-		workflow: 'update-deps.yml',
+		workflow: 'update-deps-semversion.yml',
 		branch: 'master',
 		config: {
 			'targetBranch': 'master'
@@ -23,7 +23,7 @@ module.exports = [
 		} ]
 	}, {
 		name: 'update-deps PR',
-		workflow: 'update-deps.yml',
+		workflow: 'update-deps-semversion.yml',
 		branch: 'master',
 		config: {
 			'targetBranch': 'master'
@@ -34,7 +34,7 @@ module.exports = [
 		} ]
 	}, {
 		name: 'update-deps with npm-check on custom day of month',
-		workflow: 'update-deps.yml',
+		workflow: 'update-deps-semversion.yml',
 		branch: 'master',
 		config: {
 			'npmCheckDay': npmCheckDay
@@ -45,7 +45,7 @@ module.exports = [
 		} ]
 	}, {
 		name: 'update-deps on non-existing branch',
-		workflow: 'update-deps.yml',
+		workflow: 'update-deps-semversion.yml',
 		branch: 'master',
 		config: {
 			'targetBranch': 'main'
